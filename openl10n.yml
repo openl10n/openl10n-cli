@@ -1,0 +1,13 @@
+server:
+    host: openl10n.local
+    login: user
+    password: user
+
+project: foobar
+
+files:
+    expr: src/Blablacar/Bundle/*/Resources/translations/{domain}.{local}.*
+    expr: strings/{locale}/LC_MESSAGES/{domain}.*
+    exclude: countries.en.yml
+
+options: ~

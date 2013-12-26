@@ -1,0 +1,9 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/../vendor/autoload.php';
+
+use Openl10n\Cli\Application;
+
+$cli = new Application('Openl10n', '0.1-dev');
+$cli->run();
