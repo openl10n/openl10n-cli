@@ -1,9 +1,10 @@
 {
-    "name": "openl10n/openl10n-cli",
+    "name": "openl10n/cli",
     "license": "MIT",
     "type": "project",
     "require": {
-        "symfony/console": "~2.4"
+        "symfony/console": "~2.4",
+        "openl10n/api-client": "dev-master"
     },
     "autoload": {
         "psr-0": {
