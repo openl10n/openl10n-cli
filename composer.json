@@ -1,5 +1,6 @@
 {
     "name": "openl10n/cli",
+    "description": "Command-line tool to interact with Openl10n",
     "license": "MIT",
     "type": "project",
     "require": {
