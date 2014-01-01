@@ -4,8 +4,9 @@
     "license": "MIT",
     "type": "project",
     "require": {
+        "openl10n/api-client": "dev-master",
         "symfony/console": "~2.4",
-        "openl10n/api-client": "dev-master"
+        "symfony/yaml": "~2.4"
     },
     "autoload": {
         "psr-0": {
