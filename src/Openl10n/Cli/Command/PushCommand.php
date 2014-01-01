@@ -7,6 +7,8 @@ use Openl10n\Api\Client;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\Glob;
 use Symfony\Component\Yaml\Yaml;
 
 class PushCommand extends Command
@@ -83,28 +85,35 @@ class PushCommand extends Command
         // Import files
         foreach ($data['files']['expr'] as $expr) {
             $pattern = $expr;
-            $pattern = str_replace('<domain>', '(?P<domain>\w+)', $pattern);
-            $pattern = str_replace('<locale>', '(?P<locale>\w+)', $pattern);
-            $pattern = '@'.$pattern.'@';
+            $pattern = str_replace('<domain>', '___DOMAIN_PLACEHOLDER___', $pattern);
+            $pattern = str_replace('<locale>', '___LOCALE_PLACEHOLDER___', $pattern);
+            $pattern = Glob::toRegex($pattern);
 
-            $expr = str_replace('<domain>', '*', $expr);
-            $expr = str_replace('<locale>', '*', $expr);
+            $pattern = str_replace('___DOMAIN_PLACEHOLDER___', '(?P<domain>\w+)', $pattern);
+            $pattern = str_replace('___LOCALE_PLACEHOLDER___', '(?P<locale>\w+)', $pattern);
 
-            foreach (glob($expr, GLOB_BRACE) as $filename) {
-                if (!preg_match($pattern, $filename, $matches)) {
+            $finder = new Finder();
+            $finder->in(getcwd())->path($pattern);
+            foreach ($finder->files() as $file) {
+                if (!preg_match($pattern, $file->getRelativePathname(), $matches)) {
+                    $output->writeln(sprintf(
+                        'File %s does match pattern %s',
+                        $file->getRelativePathname(),
+                        $pattern
+                    ));
                     continue;
                 }
 
                 $output->writeln(sprintf(
                     '<info>Importing file <comment>%s</comment></info>',
-                    $filename
+                    $file->getRelativePathname()
                 ));
 
                 $command = $client->getCommand('ImportDomain', array(
                     'project' => $data['project']['name'],
                     'slug' => $matches['domain'],
                     'locale' => $matches['locale'],
-                    'file' => '@'.realpath($filename)
+                    'file' => '@'.$file->getRealPath()
                 ));
                 $client->execute($command);
             }
