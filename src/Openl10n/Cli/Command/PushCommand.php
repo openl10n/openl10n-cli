@@ -30,7 +30,7 @@ class PushCommand extends Command
     {
         $filepath = getcwd().'/openl10n.yml';
 
-        $data = Yaml::parse($filepath);
+        $data = Yaml::parse(file_get_contents($filepath));
 
         $client = new Client($data['server']);
 
