@@ -37,7 +37,7 @@ class PushCommand extends Command
         // Get project
         try {
             $command = $client->getCommand('GetProject', array(
-                'slug' => $data['project']['name'],
+                'slug' => $data['project']['slug'],
             ));
             $client->execute($command);
         } catch (ClientErrorResponseException $e) {
@@ -51,15 +51,15 @@ class PushCommand extends Command
             ));
 
             $command = $client->getCommand('CreateProject', array(
-                'slug' => $data['project']['name'],
-                'name' => ucfirst($data['project']['name']),
+                'name' => $data['project']['name'],
+                'slug' => $data['project']['slug'],
             ));
             $client->execute($command);
         }
 
         // Ensure locales are present
         $command = $client->getCommand('ListLanguages', array(
-            'project' => $data['project']['name'],
+            'project' => $data['project']['slug'],
         ));
         $response = $client->execute($command);
         $locales = array();
@@ -76,7 +76,7 @@ class PushCommand extends Command
             ));
 
             $command = $client->getCommand('CreateLanguage', array(
-                'project' => $data['project']['name'],
+                'project' => $data['project']['slug'],
                 'locale' => $locale,
             ));
             $response = $client->execute($command);
@@ -108,9 +108,9 @@ class PushCommand extends Command
                     '<info>Importing file <comment>%s</comment></info>',
                     $file->getRelativePathname()
                 ));
-
                 $command = $client->getCommand('ImportDomain', array(
-                    'project' => $data['project']['name'],
+                    'project' => $data['project']['slug'],
+                    'name' => $matches['domain'],
                     'slug' => $matches['domain'],
                     'locale' => $matches['locale'],
                     'file' => '@'.$file->getRealPath()
