@@ -3,7 +3,7 @@
 namespace Openl10n\Cli\Command;
 
 use Guzzle\Http\Exception\ClientErrorResponseException;
-use Openl10n\Api\Client;
+use Openl10n\Sdk\Client;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -103,7 +103,8 @@ class PullCommand extends Command
 
                 $path = preg_replace($pattern3, '$1___LOCALE_PLACEHOLDER___$3', $file->getRelativePathname());
 
-                $export[$matches['domain']] = $path;
+                $domain = strtolower($matches['domain']);
+                $export[$domain] = $path;
             }
         }
 
