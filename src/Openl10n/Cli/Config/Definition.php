@@ -30,9 +30,21 @@ class Definition implements ConfigurationInterface
                 ->arrayNode('server')
                     ->beforeNormalization()
                     ->ifString()
-                        ->then(function($v) { return array(
-                            'hostname' => $v
-                        ); })
+                        ->then(function($v) {
+                            $home = getenv('HOME');
+                            $filepath = $home.'/.openl10n/server.conf';
+                            $data = array();
+                            if (file_exists($filepath)) {
+                                $data = parse_ini_file($filepath, true);
+                            }
+                            if (isset($data[$v])) {
+                                return $data[$v];
+                            }
+
+                            return array(
+                                'hostname' => $v
+                            );
+                        })
                     ->end()
                     ->children()
                         ->scalarNode('hostname')
