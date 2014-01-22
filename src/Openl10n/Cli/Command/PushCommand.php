@@ -4,14 +4,13 @@ namespace Openl10n\Cli\Command;
 
 use Guzzle\Http\Exception\ClientErrorResponseException;
 use Openl10n\Sdk\Client;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Glob;
 use Symfony\Component\Yaml\Yaml;
 
-class PushCommand extends Command
+class PushCommand extends AbstractCommand
 {
     /**
      * {@inheritdoc}
@@ -28,16 +27,18 @@ class PushCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $filepath = getcwd().'/openl10n.yml';
+        $data = $this->getConfig();
 
-        $data = Yaml::parse(file_get_contents($filepath));
-
-        $client = new Client($data['server']);
+        $client = new Client(array(
+            'hostname' => $data['server']['hostname'],
+            'login' => $data['server']['username'],
+            'password' => $data['server']['password'],
+        ));
 
         // Get project
         try {
             $command = $client->getCommand('GetProject', array(
-                'slug' => $data['project']['name'],
+                'slug' => $data['project']['slug'],
             ));
             $client->execute($command);
         } catch (ClientErrorResponseException $e) {
@@ -47,19 +48,19 @@ class PushCommand extends Command
 
             $output->writeln(sprintf(
                 '<info>Creating project <comment>%s</comment></info>',
-                $data['project']['name']
+                $data['project']['slug']
             ));
 
             $command = $client->getCommand('CreateProject', array(
-                'slug' => $data['project']['name'],
-                'name' => ucfirst($data['project']['name']),
+                'slug' => $data['project']['slug'],
+                'name' => ucfirst($data['project']['slug']),
             ));
             $client->execute($command);
         }
 
         // Ensure locales are present
         $command = $client->getCommand('ListLanguages', array(
-            'project' => $data['project']['name'],
+            'project' => $data['project']['slug'],
         ));
         $response = $client->execute($command);
         $locales = array();
@@ -76,15 +77,15 @@ class PushCommand extends Command
             ));
 
             $command = $client->getCommand('CreateLanguage', array(
-                'project' => $data['project']['name'],
+                'project' => $data['project']['slug'],
                 'locale' => $locale,
             ));
             $response = $client->execute($command);
         }
 
         // Import files
-        foreach ($data['files']['expr'] as $expr) {
-            $pattern = $expr;
+        foreach ($data['files'] as $file) {
+            $pattern = $file['source'];
             $pattern = str_replace('<domain>', '___DOMAIN_PLACEHOLDER___', $pattern);
             $pattern = str_replace('<locale>', '___LOCALE_PLACEHOLDER___', $pattern);
             $pattern = Glob::toRegex($pattern);
@@ -110,7 +111,7 @@ class PushCommand extends Command
                 ));
 
                 $command = $client->getCommand('ImportDomain', array(
-                    'project' => $data['project']['name'],
+                    'project' => $data['project']['slug'],
                     'slug' => $matches['domain'],
                     'locale' => $matches['locale'],
                     'file' => '@'.$file->getRealPath()

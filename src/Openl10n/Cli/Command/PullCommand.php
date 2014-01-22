@@ -4,14 +4,13 @@ namespace Openl10n\Cli\Command;
 
 use Guzzle\Http\Exception\ClientErrorResponseException;
 use Openl10n\Sdk\Client;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Glob;
 use Symfony\Component\Yaml\Yaml;
 
-class PullCommand extends Command
+class PullCommand extends AbstractCommand
 {
     /**
      * {@inheritdoc}
@@ -28,16 +27,18 @@ class PullCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $filepath = getcwd().'/openl10n.yml';
+        $data = $this->getConfig();
 
-        $data = Yaml::parse(file_get_contents($filepath));
-
-        $client = new Client($data['server']);
+        $client = new Client(array(
+            'hostname' => $data['server']['hostname'],
+            'login' => $data['server']['username'],
+            'password' => $data['server']['password'],
+        ));
 
         // Get project
         try {
             $command = $client->getCommand('GetProject', array(
-                'slug' => $data['project']['name'],
+                'slug' => $data['project']['slug'],
             ));
             $client->execute($command);
         } catch (ClientErrorResponseException $e) {
@@ -47,14 +48,14 @@ class PullCommand extends Command
 
             $output->writeln(sprintf(
                 '<error>Project "%s" does not exist</error>',
-                $data['project']['name']
+                $data['project']['slug']
             ));
 
             return 1;
         }
 
         $command = $client->getCommand('ListLanguages', array(
-            'project' => $data['project']['name'],
+            'project' => $data['project']['slug'],
         ));
         $response = $client->execute($command);
         $locales = array();
@@ -63,8 +64,8 @@ class PullCommand extends Command
         }
 
         // Get files
-        foreach ($data['files']['expr'] as $expr) {
-            $pattern = $expr;
+        foreach ($data['files'] as $file) {
+            $pattern = $file['source'];
             $pattern = str_replace('<domain>', '___DOMAIN_PLACEHOLDER___', $pattern);
             $pattern = str_replace('<locale>', '___LOCALE_PLACEHOLDER___', $pattern);
             $pattern = Glob::toRegex($pattern);
@@ -115,7 +116,7 @@ class PullCommand extends Command
                 $filepath = str_replace('___LOCALE_PLACEHOLDER___', $locale, $path);
 
                 $command = $client->getCommand('ExportDomain', array(
-                    'project' => $data['project']['name'],
+                    'project' => $data['project']['slug'],
                     'domain' => $domain,
                     'locale' => $locale,
                     'format' => $format,
