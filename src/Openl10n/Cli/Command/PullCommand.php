@@ -104,7 +104,6 @@ class PullCommand extends AbstractCommand
 
                 $path = preg_replace($pattern3, '$1___LOCALE_PLACEHOLDER___$3', $file->getRelativePathname());
 
-                $domain = strtolower($matches['domain']);
                 $export[$domain] = $path;
             }
         }
