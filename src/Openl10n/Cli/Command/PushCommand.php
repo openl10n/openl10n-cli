@@ -33,6 +33,7 @@ class PushCommand extends AbstractCommand
             'hostname' => $data['server']['hostname'],
             'login' => $data['server']['username'],
             'password' => $data['server']['password'],
+            'scheme' => $data['server']['use_ssl'] ? 'https' : 'http',
         ));
 
         // Get project

@@ -59,6 +59,15 @@ class Definition implements ConfigurationInterface
                             ->isRequired()
                             ->cannotBeEmpty()
                         ->end()
+                        ->booleanNode('use_ssl')
+                            // Because data parsed from an INI file is not
+                            // interpreted as boolean, then cast automatically.
+                            ->beforeNormalization()
+                            ->ifString()
+                                ->then(function($v) { return (boolean) $v; })
+                            ->end()
+                            ->defaultFalse()
+                        ->end()
                     ->end()
                 ->end()
             ->end();
