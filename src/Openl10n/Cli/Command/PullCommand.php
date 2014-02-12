@@ -33,6 +33,7 @@ class PullCommand extends AbstractCommand
             'hostname' => $data['server']['hostname'],
             'login' => $data['server']['username'],
             'password' => $data['server']['password'],
+            'scheme' => $data['server']['use_ssl'] ? 'https' : 'http',
         ));
 
         // Get project
@@ -87,7 +88,9 @@ class PullCommand extends AbstractCommand
                     continue;
                 }
 
-                $pattern2 = str_replace('(?P<domain>\w+)', $matches['domain'], trim($pattern, '#'));
+                $domain = $matches['domain'];
+
+                $pattern2 = str_replace('(?P<domain>\w+)', $domain, trim($pattern, '#'));
 
                 $pos = strpos($pattern2, '(?P<locale>\w+)');
                 if ($pos > 0) {
