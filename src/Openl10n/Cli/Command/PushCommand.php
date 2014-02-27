@@ -3,7 +3,8 @@
 namespace Openl10n\Cli\Command;
 
 use Guzzle\Http\Exception\ClientErrorResponseException;
-use Openl10n\Sdk\Client;
+use Openl10n\Sdk\Model\Project;
+use Openl10n\Sdk\Api;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -29,19 +30,18 @@ class PushCommand extends AbstractCommand
     {
         $data = $this->getConfig();
 
-        $client = new Client(array(
+        $api = new Api(array(
             'hostname' => $data['server']['hostname'],
-            'login' => $data['server']['username'],
+            'username' => $data['server']['username'],
             'password' => $data['server']['password'],
             'scheme' => $data['server']['use_ssl'] ? 'https' : 'http',
         ));
 
+        $projectSlug = $data['project']['slug'];
+
         // Get project
         try {
-            $command = $client->getCommand('GetProject', array(
-                'slug' => $data['project']['slug'],
-            ));
-            $client->execute($command);
+            $project = $api->getProject($projectSlug);
         } catch (ClientErrorResponseException $e) {
             if (404 !== $e->getResponse()->getStatusCode()) {
                 throw $e;
@@ -52,20 +52,16 @@ class PushCommand extends AbstractCommand
                 $data['project']['slug']
             ));
 
-            $command = $client->getCommand('CreateProject', array(
-                'slug' => $data['project']['slug'],
-                'name' => ucfirst($data['project']['slug']),
-            ));
-            $client->execute($command);
+            $project = new Project($projectSlug);
+            $project->setName(ucfirst($projectSlug));
+
+            $command = $api->createProject($project);
         }
 
         // Ensure locales are present
-        $command = $client->getCommand('ListLanguages', array(
-            'project' => $data['project']['slug'],
-        ));
-        $response = $client->execute($command);
+        $languages = $api->getLanguages($projectSlug);
         $locales = array();
-        foreach ($response as $language) {
+        foreach ($languages as $language) {
             $locales[] = $language['locale'];
         }
 
@@ -77,11 +73,7 @@ class PushCommand extends AbstractCommand
                 $locale
             ));
 
-            $command = $client->getCommand('CreateLanguage', array(
-                'project' => $data['project']['slug'],
-                'locale' => $locale,
-            ));
-            $response = $client->execute($command);
+            $command = $api->createLanguage($projectSlug, $locale);
         }
 
         // Import files
@@ -111,13 +103,7 @@ class PushCommand extends AbstractCommand
                     $file->getRelativePathname()
                 ));
 
-                $command = $client->getCommand('ImportDomain', array(
-                    'project' => $data['project']['slug'],
-                    'slug' => $matches['domain'],
-                    'locale' => $matches['locale'],
-                    'file' => '@'.$file->getRealPath()
-                ));
-                $client->execute($command);
+                $api->importFile($projectSlug, $file, $matches['domain'], $matches['locale']);
             }
         }
     }

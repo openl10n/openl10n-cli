@@ -3,7 +3,7 @@
 namespace Openl10n\Cli\Command;
 
 use Guzzle\Http\Exception\ClientErrorResponseException;
-use Openl10n\Sdk\Client;
+use Openl10n\Sdk\Api;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
@@ -29,19 +29,18 @@ class PullCommand extends AbstractCommand
     {
         $data = $this->getConfig();
 
-        $client = new Client(array(
+        $api = new Api(array(
             'hostname' => $data['server']['hostname'],
-            'login' => $data['server']['username'],
+            'username' => $data['server']['username'],
             'password' => $data['server']['password'],
             'scheme' => $data['server']['use_ssl'] ? 'https' : 'http',
         ));
 
+        $projectSlug = $data['project']['slug'];
+
         // Get project
         try {
-            $command = $client->getCommand('GetProject', array(
-                'slug' => $data['project']['slug'],
-            ));
-            $client->execute($command);
+            $project = $api->getProject($projectSlug);
         } catch (ClientErrorResponseException $e) {
             if (404 !== $e->getResponse()->getStatusCode()) {
                 throw $e;
@@ -55,12 +54,9 @@ class PullCommand extends AbstractCommand
             return 1;
         }
 
-        $command = $client->getCommand('ListLanguages', array(
-            'project' => $data['project']['slug'],
-        ));
-        $response = $client->execute($command);
+        $languages = $api->getLanguages($projectSlug);
         $locales = array();
-        foreach ($response as $language) {
+        foreach ($languages as $language) {
             $locales[] = $language['locale'];
         }
 
@@ -117,15 +113,7 @@ class PullCommand extends AbstractCommand
             foreach ($locales as $locale) {
                 $filepath = str_replace('___LOCALE_PLACEHOLDER___', $locale, $path);
 
-                $command = $client->getCommand('ExportDomain', array(
-                    'project' => $data['project']['slug'],
-                    'domain' => $domain,
-                    'locale' => $locale,
-                    'format' => $format,
-                ));
-                $response = $client->execute($command);
-
-                $content = $response->getBody(true);
+                $content = $api->exportFile($projectSlug, $domain, $locale, $format);
 
                 $md5file = '';
                 if (file_exists($filepath) && is_readable($filepath)) {
@@ -145,7 +133,6 @@ class PullCommand extends AbstractCommand
 
                     file_put_contents($filepath, $content);
                 }
-
             }
         }
     }
