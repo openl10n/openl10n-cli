@@ -86,6 +86,9 @@ class PushCommand extends AbstractCommand
             $pattern = str_replace('___DOMAIN_PLACEHOLDER___', '(?P<domain>\w+)', $pattern);
             $pattern = str_replace('___LOCALE_PLACEHOLDER___', '(?P<locale>\w+)', $pattern);
 
+            $options = $file['options'];
+            $importOptions = isset($options['push']) ? (array) $options['push'] : array();
+
             $finder = new Finder();
             $finder->in(getcwd())->path($pattern);
             foreach ($finder->files() as $file) {
@@ -103,7 +106,7 @@ class PushCommand extends AbstractCommand
                     $file->getRelativePathname()
                 ));
 
-                $api->importFile($projectSlug, $file, $matches['domain'], $matches['locale']);
+                $api->importFile($projectSlug, $file, $matches['domain'], $matches['locale'], $importOptions);
             }
         }
     }

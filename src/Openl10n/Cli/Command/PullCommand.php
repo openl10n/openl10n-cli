@@ -72,6 +72,9 @@ class PullCommand extends AbstractCommand
 
             $export = array();
 
+            $options = $file['options'];
+            $exportOptions = isset($options['pull']) ? (array) $options['pull'] : array();
+
             $finder = new Finder();
             $finder->in(getcwd())->path($pattern);
             foreach ($finder->files() as $file) {
@@ -113,7 +116,7 @@ class PullCommand extends AbstractCommand
             foreach ($locales as $locale) {
                 $filepath = str_replace('___LOCALE_PLACEHOLDER___', $locale, $path);
 
-                $content = $api->exportFile($projectSlug, $domain, $locale, $format);
+                $content = $api->exportFile($projectSlug, $domain, $locale, $format, $exportOptions);
 
                 $md5file = '';
                 if (file_exists($filepath) && is_readable($filepath)) {

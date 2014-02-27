@@ -132,7 +132,7 @@ class Definition implements ConfigurationInterface
                                     ->ifNull()
                                     ->thenEmptyArray()
                                 ->end()
-                                ->prototype('scalar')->end()
+                                ->prototype('variable')->end()
                             ->end()
                         ->end()
                     ->end()
