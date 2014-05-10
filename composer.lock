@@ -125,12 +125,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/openl10n/openl10n-sdk.git",
-                "reference": "cd069a736df901b1acbf469b540c501576858fd0"
+                "reference": "1d61560672ea3ea5fcfd71f1302d60fc5d40f5fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openl10n/openl10n-sdk/zipball/cd069a736df901b1acbf469b540c501576858fd0",
-                "reference": "cd069a736df901b1acbf469b540c501576858fd0",
+                "url": "https://api.github.com/repos/openl10n/openl10n-sdk/zipball/1d61560672ea3ea5fcfd71f1302d60fc5d40f5fb",
+                "reference": "1d61560672ea3ea5fcfd71f1302d60fc5d40f5fb",
                 "shasum": ""
             },
             "require": {
@@ -155,7 +155,7 @@
                 }
             ],
             "description": "The API client for openl10n",
-            "time": "2014-05-06 11:38:55"
+            "time": "2014-05-10 10:03:35"
         },
         {
             "name": "symfony/config",
