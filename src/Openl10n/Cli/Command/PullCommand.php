@@ -95,7 +95,7 @@ class PullCommand extends AbstractCommand
             if (isset($resourceDefinitions[$resourcePathname])) {
                 $definition = $resourceDefinitions[$resourcePathname];
             } else {
-                $ouput->writeln(sprintf('Skipping resource %s', $resourcePathname));
+                $output->writeln(sprintf('Skipping resource %s', $resourcePathname));
                 continue;
             }
 

@@ -2,6 +2,7 @@
 
 namespace Openl10n\Cli\Command;
 
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\RequestException;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 use Openl10n\Cli\File\Matcher;
@@ -114,10 +115,15 @@ class PushCommand extends AbstractCommand
             //
             foreach ($definition->getFiles() as $locale => $pathname) {
                 if (!in_array($locale, $locales)) {
-                    if ($createLocaleIfNeeded) {
+                    if (!$createLocaleIfNeeded) {
+                        continue;
+                    }
+
+                    try {
                         $output->writeln(sprintf('<info>Adding</info> locale <comment>%s</comment>', $locale));
                         $projectHandler->addLocale($locale);
-                    } else {
+                    } catch (BadResponseException $e) {
+                        $output->writeln(sprintf('<error>Unknown</error> locale <comment>%s</comment>', $locale));
                         continue;
                     }
                 }
