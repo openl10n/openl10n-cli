@@ -9,18 +9,10 @@ use Symfony\Component\Yaml\Yaml;
 
 abstract class AbstractCommand extends Command
 {
-    protected function getConfig()
+    const DEFAULT_FILENAME = 'openl10n.yml';
+
+    protected function get($serviceName)
     {
-        $filepath = getcwd().'/openl10n.yml';
-
-        $data = Yaml::parse(file_get_contents($filepath));
-
-        $processor = new Processor();
-        $config = $processor->processConfiguration(
-            new Definition(),
-            array('openl10n' => $data)
-        );
-
-        return $config;
+        return $this->getApplication()->getContainer()->get($serviceName);
     }
 }
