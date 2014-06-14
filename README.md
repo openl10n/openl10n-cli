@@ -20,24 +20,22 @@ server:
     username: user
     password: user
 
-project:
-    slug: android
-    locales: [en, fr, es]
+project: foobar
 
 files:
-    - config/locales/<locale>/<domain>.json
+    - config/translations/<locale>.json
 ```
 
 Upload translations:
 
 ```
-openl10n push
+openl10n push --locale=all
 ```
 
 Download translations:
 
 ```
-openl10n pull
+openl10n pull --locale=all
 ```
 
 ## License
