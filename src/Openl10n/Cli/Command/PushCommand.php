@@ -122,6 +122,7 @@ class PushCommand extends AbstractCommand
                     try {
                         $output->writeln(sprintf('<info>Adding</info> locale <comment>%s</comment>', $locale));
                         $projectHandler->addLocale($locale);
+                        $locales[] = $locale;
                     } catch (BadResponseException $e) {
                         $output->writeln(sprintf('<error>Unknown</error> locale <comment>%s</comment>', $locale));
                         continue;
