@@ -23,7 +23,7 @@ server:
 project: foobar
 
 files:
-    - config/translations/<locale>.json
+    - pattern: config/translations/<locale>.json
 ```
 
 Upload translations:
