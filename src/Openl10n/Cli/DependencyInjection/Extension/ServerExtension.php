@@ -17,6 +17,7 @@ class ServerExtension implements ExtensionInterface
             ->register('openl10n.api.config', 'Openl10n\Sdk\Config')
             ->addArgument($config['hostname'])
             ->addArgument($config['use_ssl'])
+            ->addArgument($config['port'])
             ->addMethodCall('setAuth', array($config['username'], $config['password']))
         ;
 
@@ -77,6 +78,9 @@ class ServerExtension implements ExtensionInterface
                         )
                     ->end()
                     ->defaultFalse()
+                ->end()
+                ->integerNode('port')
+                    ->defaultNull()
                 ->end()
             ->end();
 	}
