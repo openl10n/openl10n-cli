@@ -17,6 +17,7 @@ class ServerExtension implements ExtensionInterface
             ->register('openl10n.api.config', 'Openl10n\Sdk\Config')
             ->addArgument($config['hostname'])
             ->addArgument($config['use_ssl'])
+            ->addArgument($config['port'])
             ->addMethodCall('setAuth', array($config['username'], $config['password']))
         ;
 
@@ -34,21 +35,23 @@ class ServerExtension implements ExtensionInterface
 		$node
             ->beforeNormalization()
             ->ifString()
-                ->then(function($v) {
-                    $home = getenv('HOME');
-                    $filepath = $home.'/.openl10n/server.conf';
-                    $data = array();
-                    if (file_exists($filepath)) {
-                        $data = parse_ini_file($filepath, true);
-                    }
-                    if (isset($data[$v])) {
-                        return $data[$v];
-                    }
+                ->then(
+                    function ($v) {
+                        $home = getenv('HOME');
+                        $filepath = $home.'/.openl10n/server.conf';
+                        $data = array();
+                        if (file_exists($filepath)) {
+                            $data = parse_ini_file($filepath, true);
+                        }
+                        if (isset($data[$v])) {
+                            return $data[$v];
+                        }
 
-                    return array(
-                        'hostname' => $v
-                    );
-                })
+                        return array(
+                            'hostname' => $v
+                        );
+                    }
+                )
             ->end()
             ->children()
                 ->scalarNode('hostname')
@@ -68,9 +71,16 @@ class ServerExtension implements ExtensionInterface
                     // interpreted as boolean, then cast automatically.
                     ->beforeNormalization()
                     ->ifString()
-                        ->then(function($v) { return (boolean) $v; })
+                        ->then(
+                            function ($v) {
+                                return (boolean) $v;
+                            }
+                        )
                     ->end()
                     ->defaultFalse()
+                ->end()
+                ->integerNode('port')
+                    ->defaultNull()
                 ->end()
             ->end();
 	}
