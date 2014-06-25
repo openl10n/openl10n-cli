@@ -24,6 +24,7 @@ project: foobar
 
 files:
     - pattern: config/translations/<locale>.json
+    - pattern: app/Resources/<locale>.yml
 ```
 
 Upload translations:
