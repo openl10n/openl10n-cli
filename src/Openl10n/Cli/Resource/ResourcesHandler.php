@@ -6,34 +6,34 @@ use Openl10n\Cli\File\Matcher;
 
 class ResourcesHandler
 {
-	protected $filesConfig;
+    protected $filesConfig;
 
-	private $resourceDefinitions;
+    private $resourceDefinitions;
 
-	public function __construct(array $filesConfig)
-	{
-		$this->filesConfig = $filesConfig;
-	}
+    public function __construct(array $filesConfig)
+    {
+        $this->filesConfig = $filesConfig;
+    }
 
-	public function getResourceDefinitions()
-	{
-		if (null === $this->resourceDefinitions) {
-			$this->processResourceDefinitions();
-		}
+    public function getResourceDefinitions()
+    {
+        if (null === $this->resourceDefinitions) {
+            $this->processResourceDefinitions();
+        }
 
-		return $this->resourceDefinitions;
-	}
+        return $this->resourceDefinitions;
+    }
 
-	private function processResourceDefinitions()
-	{
-		$this->resourceDefinitions = array();
+    private function processResourceDefinitions()
+    {
+        $this->resourceDefinitions = array();
 
-		foreach ($this->filesConfig as $configFile) {
-			$matcher = new Matcher();
+        foreach ($this->filesConfig as $configFile) {
+            $matcher = new Matcher();
 
-			$options = array();
+            $options = array();
 
-			// Get every files that match given pattern
+            // Get every files that match given pattern
             $files = $matcher->match($configFile['pattern'], getcwd());
 
             // Regroup each files per resource pattern (ie. locale indenpendant)
@@ -50,13 +50,13 @@ class ResourcesHandler
 
             // Build definitions
             foreach ($resources as $pattern => $resource) {
-            	$files = [];
-            	foreach ($resource as $locale => $fileInfo) {
-            		$files[$locale] = $fileInfo->getPathname();
-            	}
+                $files = [];
+                foreach ($resource as $locale => $fileInfo) {
+                    $files[$locale] = $fileInfo->getPathname();
+                }
 
-            	$this->resourceDefinitions[] = new ResourceDefinition($pattern, $files, $options);
+                $this->resourceDefinitions[] = new ResourceDefinition($pattern, $files, $options);
             }
-		}
-	}
+        }
+    }
 }

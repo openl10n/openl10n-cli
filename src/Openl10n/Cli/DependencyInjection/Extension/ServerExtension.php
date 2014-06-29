@@ -30,9 +30,9 @@ class ServerExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-	public function setDefinition(ArrayNodeDefinition $node)
-	{
-		$node
+    public function setDefinition(ArrayNodeDefinition $node)
+    {
+        $node
             ->beforeNormalization()
             ->ifString()
                 ->then(function ($v) {
@@ -79,7 +79,7 @@ class ServerExtension implements ExtensionInterface
                     ->defaultNull()
                 ->end()
             ->end();
-	}
+    }
 
     /**
      * {@inheritdoc}

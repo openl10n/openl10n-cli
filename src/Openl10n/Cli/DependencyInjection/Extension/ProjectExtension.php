@@ -23,12 +23,12 @@ class ProjectExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-	public function setDefinition(ArrayNodeDefinition $node)
-	{
-		$node
+    public function setDefinition(ArrayNodeDefinition $node)
+    {
+        $node
             ->beforeNormalization()
             ->ifString()
-                ->then(function($v) { return array(
+                ->then(function ($v) { return array(
                     'id' => $v
                 ); })
             ->end()

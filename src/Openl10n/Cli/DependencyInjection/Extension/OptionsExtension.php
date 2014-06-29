@@ -17,16 +17,16 @@ class OptionsExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-	public function setDefinition(ArrayNodeDefinition $node)
-	{
-		$node
+    public function setDefinition(ArrayNodeDefinition $node)
+    {
+        $node
             ->beforeNormalization()
                 ->ifNull()
                 ->thenEmptyArray()
             ->end()
             ->prototype('scalar')->end()
         ;
-	}
+    }
 
     /**
      * {@inheritdoc}

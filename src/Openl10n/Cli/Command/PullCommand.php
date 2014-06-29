@@ -2,11 +2,9 @@
 
 namespace Openl10n\Cli\Command;
 
-use Openl10n\Sdk\Api;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 
 class PullCommand extends AbstractCommand
 {

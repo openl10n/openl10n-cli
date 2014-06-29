@@ -22,13 +22,13 @@ class FilesExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-	public function setDefinition(ArrayNodeDefinition $node)
-	{
-		$node
+    public function setDefinition(ArrayNodeDefinition $node)
+    {
+        $node
             ->prototype('array')
                 ->beforeNormalization()
                     ->ifString()
-                    ->then(function($v) { return array('source' => $v); })
+                    ->then(function ($v) { return array('source' => $v); })
                 ->end()
                 ->children()
                     ->scalarNode('pattern')
@@ -55,7 +55,7 @@ class FilesExtension implements ExtensionInterface
                     ->end()
                 ->end()
             ->end();
-	}
+    }
 
     /**
      * {@inheritdoc}
