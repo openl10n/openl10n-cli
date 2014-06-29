@@ -49,7 +49,6 @@ class ResourcesHandler
             }
 
             // Build definitions
-            $definitions = [];
             foreach ($resources as $pattern => $resource) {
             	$files = [];
             	foreach ($resource as $locale => $fileInfo) {
@@ -57,43 +56,6 @@ class ResourcesHandler
             	}
 
             	$this->resourceDefinitions[] = new ResourceDefinition($pattern, $files, $options);
-            }
-
-            continue;
-
-            $resourceApi = $api->getEntryPoint('resource');
-            $resourcesEntities = $resourceApi->findByProject($project);
-            $indexedResourcees = [];
-            foreach ($resourcesEntities as $entity) {
-                $indexedResourcees[$entity->getPathname()] = $entity;
-            }
-
-            foreach ($resources as $pathname => $resource) {
-                $defaultLocale = $project->getDefaultLocale();
-                $source = $resource[$defaultLocale];
-                $translations = $resource;
-                unset($translations[$defaultLocale]);
-
-                $filepath = $source->getPathname();
-
-                // check if resource exist
-                if (!array_key_exists($filepath, $indexedResourcees)) {
-                    $resource = new Resource($project->getSlug());
-                    $resource->setPathname($filepath);
-                    $resourceApi->create($resource);
-                    //echo 'Created ' . $filepath.PHP_EOL;
-                } else {
-                    $resource = $indexedResourcees[$filepath];
-                }
-
-                // import source
-                $resourceApi->import($resource, $filepath, $defaultLocale);
-
-                // import translation if option --all
-                foreach ($translations as $locale => $translation) {
-                    // TODO Create locale if no exist
-                    $resourceApi->import($resource, $translation->getPathname(), $locale);
-                }
             }
 		}
 	}

@@ -12,7 +12,6 @@ class OptionsExtension implements ExtensionInterface
      */
     public function load(array $config, ContainerBuilder $container)
     {
-        //var_dump($config);
     }
 
     /**

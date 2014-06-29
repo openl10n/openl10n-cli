@@ -2,14 +2,11 @@
 
 namespace Openl10n\Cli\Command;
 
-use Guzzle\Http\Exception\ClientErrorResponseException;
 use Openl10n\Sdk\Api;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\Glob;
-use Symfony\Component\Yaml\Yaml;
 
 class PullCommand extends AbstractCommand
 {

@@ -3,19 +3,13 @@
 namespace Openl10n\Cli\Command;
 
 use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\RequestException;
-use Guzzle\Http\Exception\ClientErrorResponseException;
-use Openl10n\Cli\File\Matcher;
 use Openl10n\Sdk\Api;
-use Openl10n\Sdk\Config;
 use Openl10n\Sdk\Model\Project;
 use Openl10n\Sdk\Model\Resource;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\Glob;
-use Symfony\Component\Yaml\Yaml;
 
 class PushCommand extends AbstractCommand
 {
