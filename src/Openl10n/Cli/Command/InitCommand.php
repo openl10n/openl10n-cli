@@ -2,13 +2,14 @@
 
 namespace Openl10n\Cli\Command;
 
+use Openl10n\Sdk\Model\Project;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
-class InitCommand extends Command
+class InitCommand extends AbstractCommand
 {
     /**
      * {@inheritdoc}
@@ -116,6 +117,24 @@ class InitCommand extends Command
 
         file_put_contents('./openl10n.yml', Yaml::dump($config, 3));
 
-        // TODO Ask to create project by api
+        $output->writeln('');
+        if ($dialog->askConfirmation($output, '<info>Would you like to create the project</info> [<comment>yes</comment>]? ', true)) {
+            $project = new Project($config['project']);
+
+            $defaultName = ucfirst($project->getSlug());
+            $name = $dialog->ask($output, "<info>Project's name</info> [<comment>$defaultName</comment>]: ", $defaultName);
+            $project->setName($name);
+
+            $defaultLocale = $dialog->ask($output, "<info>Default locale</info> [<comment>en</comment>]: ", 'en');
+            $project->setDefaultLocale($defaultLocale);
+
+            $projectApi = $this->get('openl10n.api')->getEntryPoint('project');
+            try {
+                $projectApi->create($project);
+            } catch (\Exception $e) {
+                $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+                return 1;
+            }
+        }
     }
 }
