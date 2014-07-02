@@ -3,6 +3,7 @@
 namespace Openl10n\Cli\Command;
 
 use Openl10n\Sdk\Model\Project;
+use GuzzleHttp\Exception\ClientException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -115,10 +116,25 @@ class InitCommand extends AbstractCommand
             unset($config['server']['use_ssl']);
         }
 
-        file_put_contents('./openl10n.yml', Yaml::dump($config, 3));
+        $content = Yaml::dump($config, 3);
+        $output->writeln(['', $content]);
+        if (!$dialog->askConfirmation($output, '<info>Do you confirm generation</info> [<comment>yes</comment>]? ')) {
+            return 1;
+        }
+        file_put_contents('./openl10n.yml', $content);
+
+        $projectApi = $this->get('openl10n.api')->getEntryPoint('project');
+        try {
+            $project = $projectApi->get($config['project']);
+            return ;
+        } catch (ClientException $e) {
+            if ('404' != $e->getResponse()->getStatusCode()) {
+                throw $e;
+            }
+        }
 
         $output->writeln('');
-        if ($dialog->askConfirmation($output, '<info>Would you like to create the project</info> [<comment>yes</comment>]? ', true)) {
+        if ($dialog->askConfirmation($output, '<info>Would you like to create the project</info> [<comment>yes</comment>]? ')) {
             $project = new Project($config['project']);
 
             $defaultName = ucfirst($project->getSlug());
@@ -128,7 +144,6 @@ class InitCommand extends AbstractCommand
             $defaultLocale = $dialog->ask($output, "<info>Default locale</info> [<comment>en</comment>]: ", 'en');
             $project->setDefaultLocale($defaultLocale);
 
-            $projectApi = $this->get('openl10n.api')->getEntryPoint('project');
             try {
                 $projectApi->create($project);
             } catch (\Exception $e) {
