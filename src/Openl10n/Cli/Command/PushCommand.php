@@ -4,6 +4,7 @@ namespace Openl10n\Cli\Command;
 
 use GuzzleHttp\Exception\BadResponseException;
 use Openl10n\Sdk\Model\Resource;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,6 +24,11 @@ class PushCommand extends AbstractCommand
                 InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
                 'The locale id, "default" for the source, "all" for every locales found',
                 ['default']
+            )
+            ->addArgument(
+                'files',
+                InputArgument::IS_ARRAY,
+                'File list you want to push to the server'
             )
         ;
     }
@@ -49,7 +55,7 @@ class PushCommand extends AbstractCommand
         // Get project locales
         //
         $languages = $projectHandler->getProjectLanguages();
-        $projectLocales = array_map(function($language) {
+        $projectLocales = array_map(function ($language) {
             return $language->getLocale();
         }, $languages);
 
@@ -77,7 +83,7 @@ class PushCommand extends AbstractCommand
         //
         $resourceApi = $this->get('openl10n.api')->getEntryPoint('resource');
         $resources = $resourceApi->findByProject($project);
-        $resources = array_combine(array_map(function($resource) {
+        $resources = array_combine(array_map(function ($resource) {
             return $resource->getPathname();
         }, $resources), $resources);
 
@@ -104,6 +110,7 @@ class PushCommand extends AbstractCommand
             //
             // Upload files
             //
+            $fileFilter = $input->getArgument('files');
             foreach ($definition->getFiles() as $locale => $pathname) {
                 if (!in_array($locale, $locales)) {
                     if (!$createLocaleIfNeeded) {
@@ -118,6 +125,11 @@ class PushCommand extends AbstractCommand
                         $output->writeln(sprintf('<error>Unknown</error> locale <comment>%s</comment>', $locale));
                         continue;
                     }
+                }
+
+                // Skip unwanted files
+                if (!empty($fileFilter) && !in_array($pathname, $fileFilter)) {
+                    continue;
                 }
 
                 $output->writeln(sprintf('<info>Uploading</info> file <comment>%s</comment>', $pathname));

@@ -14,7 +14,7 @@ mv openl10n.phar /usr/local/bin/openl10n
 
 Write a `openl10n.yml` file on the root of your project:
 
-```
+```yaml
 server:
     hostname: openl10n.dev
     username: user
@@ -29,14 +29,20 @@ files:
 
 Upload translations:
 
-```
+```shell
 openl10n push --locale=all
 ```
 
 Download translations:
 
-```
+```shell
 openl10n pull --locale=all
+```
+
+### Select files to upload
+You can select the files you want to push to the server by adding a file name list at the end of the command:
+```shell
+openl10n push --locale=all app/Resources/fr.yml config/translations/de.yml
 ```
 
 ## License
