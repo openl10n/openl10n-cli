@@ -89,10 +89,21 @@ class InitCommand extends AbstractCommand
         }
 
         if (empty($options['files'])) {
+            $defaultPatterns = [];
+            if (file_exists('app/AppKernel.php')) {
+                $output->writeln(['', '<info>Symfony2 application is detected.</info>']);
+                $defaultPatterns[] = 'app/Resources/translations/*.<locale>.*';
+                $defaultPatterns[] = 'src/*/*Bundle/Resources/translations/*.<locale>.*';
+            }
+            $defaultPattern = array_shift($defaultPatterns);
+
             $output->writeln('');
-            while (null !== $file = $dialog->ask($output, '<info>Pattern file</info> []: ')) {
+            while (null !== $file = $dialog->ask($output, "<info>Pattern file</info> [<comment>$defaultPattern</comment>]: ", $defaultPattern)) {
                 if (false !== $file) {
                     $options['files'][] = $file;
+                }
+                if (null !== $defaultPattern) {
+                    $defaultPattern = array_shift($defaultPatterns);
                 }
             }
         }
