@@ -153,6 +153,9 @@ class InitCommand extends AbstractCommand
             $defaultLocale = $dialog->ask($output, "<info>Default locale</info> [<comment>en</comment>]: ", 'en');
             $project->setDefaultLocale($defaultLocale);
 
+            $description = $dialog->ask($output, "<info>Description</info> []: ");
+            $project->setDescription($description);
+
             try {
                 $projectApi->create($project);
             } catch (\Exception $e) {
