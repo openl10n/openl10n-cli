@@ -39,8 +39,11 @@ class InitCommand extends AbstractCommand
         $dialog = $this->getHelperSet()->get('dialog');
         $options = $input->getOptions();
 
+        $rootDir = $this->getApplication()->getWorkingDirectory();
+        $configPathname = $this->getApplication()->getConfigPathname();
+
         if (null === $options['project']) {
-            $project = basename(realpath('.'));
+            $project = basename(realpath($rootDir));
             $options['project'] = $dialog->ask($output, "<info>Project's slug</info> [<comment>$project</comment>]: ", $project);
         }
         if (null === $options['hostname']) {
@@ -128,7 +131,7 @@ class InitCommand extends AbstractCommand
             return 1;
         }
 
-        file_put_contents('./openl10n.yml', $content);
+        file_put_contents($configPathname, $content);
 
         $projectApi = $this->get('openl10n.api')->getEntryPoint('project');
 

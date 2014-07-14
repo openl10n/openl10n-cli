@@ -93,6 +93,8 @@ class PushCommand extends AbstractCommand
         $resourcesHandler = $this->get('openl10n.resources_handler');
         $resourceDefinitions = $resourcesHandler->getResourceDefinitions();
 
+        $rootDir = $this->getApplication()->getWorkingDirectory();
+
         foreach ($resourceDefinitions as $definition) {
             $sourcePathname = $definition->getPathnameForLocale($defaultLocale);
 
@@ -133,7 +135,7 @@ class PushCommand extends AbstractCommand
                 }
 
                 $output->writeln(sprintf('<info>Uploading</info> file <comment>%s</comment>', $pathname));
-                $resourceApi->import($resource, $pathname, $locale);
+                $resourceApi->import($resource, $rootDir.'/'.$pathname, $locale);
             }
         }
     }

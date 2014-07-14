@@ -83,6 +83,7 @@ class PullCommand extends AbstractCommand
             return $resourceDef->getPathnameForLocale($defaultLocale);
         }, $resourceDefinitions), $resourceDefinitions);
 
+        $rootDir = $this->getApplication()->getWorkingDirectory();
 
         foreach ($resources as $resource) {
             $resourcePathname = $resource->getPathname();
@@ -103,7 +104,7 @@ class PullCommand extends AbstractCommand
                 $output->writeln(sprintf('<info>Downloading</info> file <comment>%s</comment>', $pathname));
                 $content = $resourceApi->export($resource, $locale);
 
-                file_put_contents($pathname, $content);
+                file_put_contents($rootDir.'/'.$pathname, $content);
             }
         }
     }

@@ -4,6 +4,7 @@ namespace Openl10n\Cli\DependencyInjection\Extension;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class FilesExtension implements ExtensionInterface
 {
@@ -14,8 +15,8 @@ class FilesExtension implements ExtensionInterface
     {
         $container
             ->register('openl10n.resources_handler', 'Openl10n\Cli\Resource\ResourcesHandler')
-            // ->addArgument(new Reference('openl10n.api'))
             ->addArgument($config)
+            ->addArgument(new Reference('openl10n.application'))
         ;
     }
 

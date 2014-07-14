@@ -2,17 +2,20 @@
 
 namespace Openl10n\Cli\Resource;
 
+use Openl10n\Cli\Application;
 use Openl10n\Cli\File\Matcher;
 
 class ResourcesHandler
 {
     protected $filesConfig;
+    protected $application;
 
     private $resourceDefinitions;
 
-    public function __construct(array $filesConfig)
+    public function __construct(array $filesConfig, Application $application)
     {
         $this->filesConfig = $filesConfig;
+        $this->application = $application;
     }
 
     public function getResourceDefinitions()
@@ -34,7 +37,8 @@ class ResourcesHandler
             $options = array();
 
             // Get every files that match given pattern
-            $files = $matcher->match($configFile['pattern'], getcwd());
+            $inDir = $this->application->getWorkingDirectory();
+            $files = $matcher->match($configFile['pattern'], $inDir);
 
             // Regroup each files per resource pattern (ie. locale indenpendant)
             $resources = [];
