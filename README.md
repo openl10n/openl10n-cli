@@ -17,6 +17,8 @@ Write a `openl10n.yml` file on the root of your project:
 ```yaml
 server:
     hostname: openl10n.dev
+    # port: 80 # Specify port if needed
+    # use_ssl: true # If openl10n is protected by ssl
     username: user
     password: user
 
@@ -25,6 +27,9 @@ project: foobar
 files:
     - pattern: config/translations/<locale>.json
     - pattern: app/Resources/<locale>.yml
+    # For symfony if you want to import all your translation files
+    # - pattern: app/Resources/translations/*.<locale>.*
+    # - pattern: src/*Bundle/Resources/translations/*.<locale>.*
 ```
 
 Upload translations:
