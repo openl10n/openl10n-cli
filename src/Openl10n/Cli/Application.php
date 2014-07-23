@@ -19,7 +19,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class Application extends BaseApplication
 {
-    const CONFIG_FILENAME = 'openl10n.yml';
+    const CONFIG_FILENAME = '.openl10n.yml';
 
     protected $container;
     protected $workingDir;
