@@ -21,7 +21,7 @@ class ConfigurationLoader
 
 	public function loadConfiguration()
 	{
-		$filepath = $this->rootDirectory.DIRECTORY_SEPARATOR.$this->filename;
+		$filepath = $this->getConfigurationFilepath();
 
 		if (!file_exists($filepath)) {
             throw new ConfigurationLoadingException(
@@ -35,6 +35,11 @@ class ConfigurationLoader
 	public function getRootDirectory()
 	{
 		return $this->rootDirectory;
+	}
+
+	public function getConfigurationFilepath()
+	{
+		return $this->rootDirectory.DIRECTORY_SEPARATOR.$this->filename;
 	}
 
 	public function setRootDirectory($rootDirectory)

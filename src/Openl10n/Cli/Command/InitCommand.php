@@ -5,13 +5,15 @@ namespace Openl10n\Cli\Command;
 use GuzzleHttp\Exception\ClientException;
 use Openl10n\Sdk\Model\Project;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class InitCommand extends AbstractCommand
 {
+    protected $configuration = array();
+
     /**
      * {@inheritdoc}
      */
@@ -20,13 +22,8 @@ class InitCommand extends AbstractCommand
         $this
             ->setName('init')
             ->setDefinition(array(
-                new InputOption('project', null, InputOption::VALUE_REQUIRED, 'Slug of the project'),
-                new InputOption('hostname', null, InputOption::VALUE_REQUIRED, 'Set server hostname'),
-                new InputOption('port', null, InputOption::VALUE_REQUIRED, 'Specific port for the server'),
-                new InputOption('ssl', null, InputOption::VALUE_NONE, 'Use SSL'),
-                new InputOption('username', null, InputOption::VALUE_REQUIRED, 'Set server user'),
-                new InputOption('password', null, InputOption::VALUE_REQUIRED, 'Set server password'),
-                new InputOption('files', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Pattern of translation ressources, e.g. "locales/<locale>.yml"')
+                new InputArgument('url', InputArgument::OPTIONAL, 'URL of the openl10n instance (eg. http://user:userpass@openl10n.dev)'),
+                new InputArgument('project', InputArgument::OPTIONAL, 'Slug of the project'),
             ))
         ;
     }
@@ -36,47 +33,58 @@ class InitCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $server = [
+            'scheme' => null,
+            'user' => null,
+            'pass' => null,
+            'port' => null,
+            'host' => null
+        ];
+
+
+        if (null !== $url = $input->getArgument('url')) {
+            $urlParts = parse_url($url);
+            $server = array_merge($server, $urlParts);
+        }
+
+        $this->getApplication()->ignoreMissingConfiguration();
+        $configurationLoader = $this->get('configuration.loader');
         $dialog = $this->getHelperSet()->get('dialog');
-        $options = $input->getOptions();
 
-        $rootDir = $this->getApplication()->getWorkingDirectory();
-        $configPathname = $this->getApplication()->getConfigPathname();
-
-        if (null === $options['project']) {
-            $project = basename(realpath($rootDir));
-            $options['project'] = $dialog->ask($output, "<info>Project's slug</info> [<comment>$project</comment>]: ", $project);
-        }
-        if (null === $options['hostname']) {
-            $options['hostname'] = $dialog->ask($output, '<info>Hostname</info> [<comment>openl10n.dev</comment>]: ', 'openl10n.dev');
-        }
-        if (false === $options['ssl']) {
-            $options['ssl'] = $dialog->askConfirmation($output, '<info>Enable ssl</info> [<comment>no</comment>]? ', false);
-        }
-        if (null === $options['port']) {
-            $port = $options['ssl'] ? 443 : 80;
-            $options['port'] = $dialog->askAndValidate(
-                $output,
-                "<info>Port</info> [<comment>$port</comment>]: ",
-                function ($answer) {
-                    if (!is_int($answer) && !ctype_digit($answer)) {
-                        throw new \RuntimeException('The port must be an integer.');
-                    }
-
-                    return (int) $answer;
-                },
-                false,
-                $port
-            );
+        // Server
+        $this->configuration['server'] = [];
+        if (null !== $hostname = $server['host']) {
+            $this->configuration['server']['hostname'] = $hostname;
         } else {
-            $options['port'] = (int) $options['port'];
+            $this->configuration['server']['hostname'] = $dialog->ask($output, '<info>Hostname</info> [<comment>openl10n.dev</comment>]: ', 'openl10n.dev');
         }
 
-        if (null === $options['username']) {
-            $user = get_current_user();
-            $options['username'] = $dialog->ask($output, "<info>Username</info> [<comment>$user</comment>]: ", $user);
+        if (null !== $scheme = $server['scheme']) {
+            $this->configuration['server']['use_ssl'] = 'https' === $scheme;
+        } else {
+            $this->configuration['server']['use_ssl'] = $dialog->askConfirmation($output, '<info>Enable ssl</info> [<comment>no</comment>]? ', false);
         }
-        if (null === $options['password']) {
-            $options['password'] = $dialog->askHiddenResponseAndValidate(
+
+        if (false === $this->configuration['server']['use_ssl']) {
+            unset($this->configuration['server']['use_ssl']);
+        }
+
+        if (null !== $port = $server['port']) {
+            $this->configuration['server']['port'] = $port;
+        }
+
+        if (null !== $username = $server['user']) {
+            $this->configuration['server']['username'] = $username;
+        } else {
+            $currentUser = get_current_user();
+            $this->configuration['server']['username'] = $dialog->ask($output, "<info>Username</info> [<comment>$currentUser</comment>]: ", $currentUser);
+        }
+
+        if (null !== $password = $server['pass']) {
+            $this->configuration['server']['password'] = $password;
+        } else {
+            $currentUser = get_current_user();
+            $this->configuration['server']['password'] = $dialog->askHiddenResponseAndValidate(
                 $output,
                 '<info>Password</info> []: ',
                 function ($answer) {
@@ -91,52 +99,43 @@ class InitCommand extends AbstractCommand
             );
         }
 
-        if (empty($options['files'])) {
-            $output->writeln('');
-            while (null !== $file = $dialog->ask($output, '<info>Pattern file</info> []: ')) {
-                if (false !== $file) {
-                    $options['files'][] = $file;
-                }
+        // Project
+        if (null !== $projectSlug = $input->getArgument('project')) {
+            $this->configuration['project'] = $projectSlug;
+        } else {
+            $project = basename(realpath($configurationLoader->getRootDirectory()));
+            $this->configuration['project'] = $dialog->ask($output, "<info>Project's slug</info> [<comment>$project</comment>]: ", $project);
+        }
+
+        // Files
+        $this->configuration['files'] = [];
+        while (null !== $file = $dialog->ask($output, '<info>Pattern file</info> []: ')) {
+            if (false !== $file) {
+                $this->configuration['files']['pattern'] = ['pattern' => $file];
             }
         }
 
-        $config = array(
-            'server' => array(
-               'hostname' => $options['hostname'],
-               'port' => (int) $options['port'],
-               'use_ssl' => (bool) $options['ssl'],
-               'username' => $options['username'],
-               'password' => $options['password'],
-            ),
-            'project' => $options['project'],
-        );
-
-        if (null !== $options['files']) {
-            foreach ($options['files'] as $file) {
-                $config['files'][] = ['pattern' => $file];
-            }
-        }
-        if ((80 === $options['port'] && !$options['ssl']) ||
-            (443 === $options['port'] && $options['ssl'])
-        ) {
-            unset($config['server']['port']);
-        }
-        if (!$options['ssl']) {
-            unset($config['server']['use_ssl']);
+        // Add example of file pattern
+        if (empty($this->configuration['files'])) {
+            $this->configuration['files'][] = ['pattern' => 'path/to/translations.<locale>.yml'];
         }
 
-        $content = Yaml::dump($config, 3);
+        // Dump configuration
+        $content = Yaml::dump($this->configuration, 3);
         $output->writeln(['', $content]);
         if (!$dialog->askConfirmation($output, '<info>Do you confirm generation</info> [<comment>yes</comment>]? ')) {
             return 1;
         }
 
-        file_put_contents($configPathname, $content);
+        file_put_contents($configurationLoader->getConfigurationFilepath(), $content);
 
-        $projectApi = $this->get('openl10n.api')->getEntryPoint('project');
+        // Destroy current container to force recreate it with configured service
+        $this->getApplication()->destroyContainer();
+
+        $projectApi = $this->get('api')->getEntryPoint('project');
 
         try {
-            $project = $projectApi->get($config['project']);
+            $project = $projectApi->get($projectSlug);
 
             return;
         } catch (ClientException $e) {
@@ -147,7 +146,7 @@ class InitCommand extends AbstractCommand
 
         $output->writeln('');
         if ($dialog->askConfirmation($output, '<info>Would you like to create the project</info> [<comment>yes</comment>]? ')) {
-            $project = new Project($config['project']);
+            $project = new Project($projectSlug);
 
             $defaultName = ucfirst($project->getSlug());
             $name = $dialog->ask($output, "<info>Project's name</info> [<comment>$defaultName</comment>]: ", $defaultName);
