@@ -3,7 +3,7 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use Openl10n\Cli\Application;
-
-$cli = new Application('Openl10n', '@package_version@');
-$cli->run();
+(new Openl10n\Cli\ApplicationFactory())
+	->createApplication()
+	->run()
+;

@@ -5,71 +5,128 @@ namespace Openl10n\Cli;
 use Openl10n\Cli\Command as Command;
 use Openl10n\Cli\DependencyInjection\Configuration;
 use Openl10n\Cli\DependencyInjection\Extension;
-use Openl10n\Cli\Listener;
+use Openl10n\Cli\ServiceContainer\Configuration\ConfigurationLoader;
+use Openl10n\Cli\ServiceContainer\Configuration\ConfigurationTree;
+use Openl10n\Cli\ServiceContainer\Exception\ConfigurationLoadingException;
+use Openl10n\Cli\ServiceContainer\Exception\ConfigurationProcessingException;
+use Openl10n\Cli\ServiceContainer\ExtensionManager;
+use Openl10n\Cli\ServiceContainer\Extension\ConfiguredExtension;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Application as BaseApplication;
-use Symfony\Component\Console\Command\Command as BaseCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Application extends BaseApplication
 {
-    const CONFIG_FILENAME = '.openl10n.yml';
-
     protected $container;
-    protected $workingDir;
+    protected $ignoreMissingConfiguration;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($name, $version)
+    public function __construct($name, $version, ConfigurationLoader $configurationLoader, ExtensionManager $extensionManager)
     {
         parent::__construct($name, $version);
 
-        $dispatcher = $this->createEventDispatcher();
+        $this->configurationLoader = $configurationLoader;
+        $this->extensionManager = $extensionManager;
 
-        $this->setDispatcher($dispatcher);
-        $this->workingDir = getcwd();
+        $this->ignoreMissingConfiguration = false;
     }
 
     public function getContainer()
     {
         if (null === $this->container) {
-            $this->buildContainer();
+            $this->container = $this->createContainer();
         }
 
         return $this->container;
     }
 
-    public function getWorkingDirectory()
+    /**
+     * Force container to be recreated.
+     */
+    public function destroyContainer()
     {
-        return $this->workingDir;
-    }
-
-    public function setWorkingDirectory($workingDir)
-    {
-        if (!is_dir($workingDir)) {
-            throw new \RuntimeException(sprintf('%s is not a valid directory', $workingDir));
-        }
-
-        $this->workingDir = $workingDir;
+        $this->container = null;
     }
 
     /**
-     * Lookup for current configuration file.
+     * Ignore when the configuration file is missing.
      *
-     * @param string $filename Filename to search
+     * Useful for commands which don't need the configurated services
+     * such as the `init` command.
      *
-     * @return string The full filepath of the configuration
+     * @param boolean $value
      */
-    public function getConfigPathname()
+    public function ignoreMissingConfiguration($value = true)
     {
-        return $this->workingDir.'/'.self::CONFIG_FILENAME;
+        $this->ignoreMissingConfiguration = $value;
+    }
+
+    protected function createContainer()
+    {
+        $container = new ContainerBuilder();
+
+        // Default configuration.
+        $container->set('application', $this);
+        $container->set('configuration.loader', $this->configurationLoader);
+
+        // Initialize extensions.
+        $this->initializeExtensions($container);
+
+        // Load configuration.
+        try {
+            $this->loadConfiguration($container);
+        } catch (ConfigurationLoadingException $e) {
+            // No configuration file found.
+            // Continue with restricted services if `ignoreMissingConfiguration`
+            // has been specified.
+            if (!$this->ignoreMissingConfiguration) {
+                throw $e;
+            }
+        }
+
+        // Process compiler pass & compile container
+        $container->compile();
+
+        return $container;
+    }
+
+    protected function initializeExtensions(ContainerInterface $container)
+    {
+        foreach ($this->extensionManager->getExtensions() as $extension) {
+            $extension->initialize($container);
+        }
+    }
+
+    protected function loadConfiguration(ContainerInterface $container)
+    {
+        // Validate configuration (only ConfiguredExtension are impacted)
+        $extensions = array_filter($this->extensionManager->getExtensions(), function($extension) {
+            return $extension instanceof ConfiguredExtension;
+        });
+
+        // Read the configuration
+        $rawConfigs = $this->configurationLoader->loadConfiguration();
+
+        // Process configuration
+        $configurationTree = new ConfigurationTree($extensions);
+        $configs = (new Processor())->processConfiguration(
+            $configurationTree,
+            array('openl10n' => $rawConfigs)
+        );
+
+        // Load extension with correct configuration
+        foreach ($extensions as $extension) {
+            $name = $extension->getName();
+
+            if (!isset($configs[$name])) {
+                throw new ConfigurationProcessingException(sprintf('Missing configuration for node "%s"', $name));
+            }
+
+            $config = $configs[$name];
+
+            $extension->load($config, $container);
+        }
     }
 
     /**
@@ -82,74 +139,5 @@ class Application extends BaseApplication
             new Command\PullCommand(),
             new Command\PushCommand(),
         ));
-    }
-
-    /**
-     * Build container.
-     */
-    protected function buildContainer()
-    {
-        $this->container = new ContainerBuilder();
-
-        $rawConfig = $this->getRawConfig();
-
-        $extensions = [
-            'server' => new Extension\ServerExtension(),
-            'project' => new Extension\ProjectExtension(),
-            'files' => new Extension\FilesExtension(),
-            'options' => new Extension\OptionsExtension(),
-        ];
-
-        $processor = new Processor();
-        $config = $processor->processConfiguration(
-            new Configuration($extensions),
-            array('openl10n' => $rawConfig)
-        );
-
-        // Register current application instance
-        $this->container->set('openl10n.application', $this);
-
-        // Load each extension
-        foreach ($config as $name => $parameters) {
-            $extensions[$name]->load($parameters, $this->container);
-        }
-    }
-
-    /**
-     * Get configuration parameters.
-     *
-     * @return array Parameters tree
-     */
-    protected function getRawConfig()
-    {
-        $filepath = $this->getConfigPathname();
-
-        if (!file_exists($filepath)) {
-            throw new \RuntimeException('Unable to find a configuration file');
-        }
-
-        return Yaml::parse(file_get_contents($filepath));
-    }
-
-    /**
-     * Create an event dispatcher.
-     *
-     * @return EventDispatcherInterface
-     */
-    private function createEventDispatcher()
-    {
-        $dispatcher = new EventDispatcher();
-
-        // Add event subscribers to dispatcher
-        $listeners = [
-            new Listener\WorkingDirectoryListener()
-        ];
-
-        foreach ($listeners as $listener) {
-            $listener->setApplication($this);
-            $dispatcher->addSubscriber($listener);
-        }
-
-        return $dispatcher;
     }
 }

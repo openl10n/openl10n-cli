@@ -1,20 +1,23 @@
 <?php
 
-namespace Openl10n\Cli\DependencyInjection;
+namespace Openl10n\Cli\ServiceContainer\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-class Configuration implements ConfigurationInterface
+class ConfigurationTree implements ConfigurationInterface
 {
-    protected $extensions;
+	/**
+	 * @var array
+	 */
+	protected $extensions;
 
-    public function __construct(array $extensions = array())
-    {
-        $this->extensions = $extensions;
-    }
+	public function __construct(array $extensions)
+	{
+		$this->extensions = $extensions;
+	}
 
-    public function getConfigTreeBuilder()
+	public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('openl10n');
@@ -24,7 +27,7 @@ class Configuration implements ConfigurationInterface
 
             $node = $rootNode->children()->arrayNode($rootName);
 
-            $extension->setDefinition($node);
+            $extension->configure($node);
         }
 
         return $treeBuilder;

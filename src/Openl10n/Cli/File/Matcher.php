@@ -81,7 +81,11 @@ class Matcher
                 }
             }
 
-            $results[] = new FileInfo($filePattern, $attributes);
+            $results[] = new FileInfo(
+                $inDir,
+                new Pattern($filePattern),
+                $attributes
+            );
         }
 
         return $results;

@@ -4,29 +4,34 @@ namespace Openl10n\Cli\File;
 
 class FileInfo
 {
+    protected $rootDirectory;
+
     protected $pattern;
 
     protected $attributes;
 
-    public function __construct($pattern, array $attributes)
+    public function __construct($rootDirectory, Pattern $pattern, array $attributes)
     {
+        $this->rootDirectory = $rootDirectory;
         $this->pattern = $pattern;
         $this->attributes = $attributes;
     }
 
-    public function getPathname(array $excludeAttributes = array())
+    public function getAbsolutePathname()
     {
-        $attributes = $this->attributes;
+        return realpath($this->rootDirectory.DIRECTORY_SEPARATOR.$this->getPathname());
+    }
 
-        foreach ($excludeAttributes as $attr) {
-            unset($attributes[$attr]);
-        }
+    public function getRelativePathname()
+    {
+        return $this->getPathname();
+    }
 
-        $placeholders = array_map(function ($attribute) {
-            return "<$attribute>";
-        }, array_keys($attributes));
+    public function getPathname(array $usingAttributes = array())
+    {
+        $attributes = array_merge($this->attributes, $usingAttributes);
 
-        return str_replace($placeholders, $attributes, $this->pattern);
+        return $this->pattern->toString($attributes);
     }
 
     public function getAttribute($name)

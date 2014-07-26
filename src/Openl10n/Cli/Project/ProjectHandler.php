@@ -2,43 +2,21 @@
 
 namespace Openl10n\Cli\Project;
 
-use Openl10n\Sdk\Api;
 
 class ProjectHandler
 {
-    protected $api;
-
     protected $projectId;
 
     /**
-     * @param Api    $api
-     * @param string $projectId
+     * @param string $projectSlug
      */
-    public function __construct(Api $api, $projectId)
+    public function __construct($projectSlug)
     {
-        $this->api = $api;
-        $this->projectId = $projectId;
+        $this->projectSlug = $projectSlug;
     }
 
-    public function getProject()
+    public function getProjectSlug()
     {
-        $projectApi = $this->api->getEntryPoint('project');
-        $project = $projectApi->get($this->projectId);
-
-        return $project;
-    }
-
-    public function getProjectLanguages()
-    {
-        $projectApi = $this->api->getEntryPoint('project');
-        $languages = $projectApi->getLanguages($this->projectId);
-
-        return $languages;
-    }
-
-    public function addLocale($locale)
-    {
-        $projectApi = $this->api->getEntryPoint('project');
-        $projectApi->addLanguage($this->projectId, $locale);
+        return $this->projectSlug;
     }
 }
