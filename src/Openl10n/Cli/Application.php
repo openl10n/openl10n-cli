@@ -81,6 +81,7 @@ class Application extends BaseApplication
             new Command\InitCommand(),
             new Command\PullCommand(),
             new Command\PushCommand(),
+            new Command\ValidateCommand(),
         ));
     }
 
