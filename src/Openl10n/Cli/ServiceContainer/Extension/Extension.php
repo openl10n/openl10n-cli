@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 interface Extension
 {
-	public function initialize(ContainerBuilder $container);
+    public function initialize(ContainerBuilder $container);
 
-	public function getName();
+    public function getName();
 }

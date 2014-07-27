@@ -40,7 +40,6 @@ class InitCommand extends AbstractCommand
             'host' => null
         ];
 
-
         if (null !== $url = $input->getArgument('url')) {
             $urlParts = parse_url($url);
             $server = array_merge($server, $urlParts);

@@ -7,17 +7,17 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class ConfigurationTree implements ConfigurationInterface
 {
-	/**
-	 * @var array
-	 */
-	protected $extensions;
+    /**
+     * @var array
+     */
+    protected $extensions;
 
-	public function __construct(array $extensions)
-	{
-		$this->extensions = $extensions;
-	}
+    public function __construct(array $extensions)
+    {
+        $this->extensions = $extensions;
+    }
 
-	public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('openl10n');

@@ -7,43 +7,43 @@ use Symfony\Component\Yaml\Yaml;
 
 class ConfigurationLoader
 {
-	protected $rootDirectory;
-	protected $filename;
+    protected $rootDirectory;
+    protected $filename;
 
-	/**
-	 * @param string $filename Configuration file name
-	 */
-	public function __construct($rootDirectory, $filename)
-	{
-		$this->rootDirectory = $rootDirectory;
-		$this->filename = $filename;
-	}
+    /**
+     * @param string $filename Configuration file name
+     */
+    public function __construct($rootDirectory, $filename)
+    {
+        $this->rootDirectory = $rootDirectory;
+        $this->filename = $filename;
+    }
 
-	public function loadConfiguration()
-	{
-		$filepath = $this->getConfigurationFilepath();
+    public function loadConfiguration()
+    {
+        $filepath = $this->getConfigurationFilepath();
 
-		if (!file_exists($filepath)) {
+        if (!file_exists($filepath)) {
             throw new ConfigurationLoadingException(
-            	sprintf('Unable to find a configuration file in %s', $this->rootDirectory
+                sprintf('Unable to find a configuration file in %s', $this->rootDirectory
             ));
         }
 
         return Yaml::parse(file_get_contents($filepath));
-	}
+    }
 
-	public function getRootDirectory()
-	{
-		return $this->rootDirectory;
-	}
+    public function getRootDirectory()
+    {
+        return $this->rootDirectory;
+    }
 
-	public function getConfigurationFilepath()
-	{
-		return $this->rootDirectory.DIRECTORY_SEPARATOR.$this->filename;
-	}
+    public function getConfigurationFilepath()
+    {
+        return $this->rootDirectory.DIRECTORY_SEPARATOR.$this->filename;
+    }
 
-	public function setRootDirectory($rootDirectory)
-	{
-		$this->rootDirectory = $rootDirectory;
-	}
+    public function setRootDirectory($rootDirectory)
+    {
+        $this->rootDirectory = $rootDirectory;
+    }
 }

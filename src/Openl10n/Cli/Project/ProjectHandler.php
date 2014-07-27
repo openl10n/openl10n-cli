@@ -2,7 +2,6 @@
 
 namespace Openl10n\Cli\Project;
 
-
 class ProjectHandler
 {
     protected $projectId;

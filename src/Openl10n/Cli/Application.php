@@ -2,20 +2,11 @@
 
 namespace Openl10n\Cli;
 
-use Openl10n\Cli\Command as Command;
-use Openl10n\Cli\DependencyInjection\Configuration;
-use Openl10n\Cli\DependencyInjection\Extension;
 use Openl10n\Cli\ServiceContainer\Configuration\ConfigurationLoader;
-use Openl10n\Cli\ServiceContainer\Configuration\ConfigurationTree;
 use Openl10n\Cli\ServiceContainer\Exception\ConfigurationLoadingException;
-use Openl10n\Cli\ServiceContainer\Exception\ConfigurationProcessingException;
 use Openl10n\Cli\ServiceContainer\ExtensionManager;
-use Openl10n\Cli\ServiceContainer\Extension\ConfiguredExtension;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Application as BaseApplication;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Application extends BaseApplication
 {
@@ -71,11 +62,13 @@ class Application extends BaseApplication
         $container->set('configuration.loader', $this->configurationLoader);
 
         // Initialize extensions.
-        $this->initializeExtensions($container);
+        $this->extensionManager->initialize($container);
 
         // Load configuration.
         try {
-            $this->loadConfiguration($container);
+            $rawConfigs = $this->configurationLoader->loadConfiguration();
+
+            $this->extensionManager->load($rawConfigs, $container);
         } catch (ConfigurationLoadingException $e) {
             // No configuration file found.
             // Continue with restricted services if `ignoreMissingConfiguration`
@@ -89,55 +82,5 @@ class Application extends BaseApplication
         $container->compile();
 
         return $container;
-    }
-
-    protected function initializeExtensions(ContainerInterface $container)
-    {
-        foreach ($this->extensionManager->getExtensions() as $extension) {
-            $extension->initialize($container);
-        }
-    }
-
-    protected function loadConfiguration(ContainerInterface $container)
-    {
-        // Validate configuration (only ConfiguredExtension are impacted)
-        $extensions = array_filter($this->extensionManager->getExtensions(), function($extension) {
-            return $extension instanceof ConfiguredExtension;
-        });
-
-        // Read the configuration
-        $rawConfigs = $this->configurationLoader->loadConfiguration();
-
-        // Process configuration
-        $configurationTree = new ConfigurationTree($extensions);
-        $configs = (new Processor())->processConfiguration(
-            $configurationTree,
-            array('openl10n' => $rawConfigs)
-        );
-
-        // Load extension with correct configuration
-        foreach ($extensions as $extension) {
-            $name = $extension->getName();
-
-            if (!isset($configs[$name])) {
-                throw new ConfigurationProcessingException(sprintf('Missing configuration for node "%s"', $name));
-            }
-
-            $config = $configs[$name];
-
-            $extension->load($config, $container);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultCommands()
-    {
-        return array_merge(parent::getDefaultCommands(), array(
-            new Command\InitCommand(),
-            new Command\PullCommand(),
-            new Command\PushCommand(),
-        ));
     }
 }

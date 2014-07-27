@@ -50,7 +50,7 @@ class FilesExtension implements ConfiguredExtension
                             ->ifNull()
                             ->thenEmptyArray()
                             ->ifString()
-                            ->then(function($v) { return array($v); })
+                            ->then(function ($v) { return array($v); })
                         ->end()
                         ->prototype('scalar')->end()
                     ->end()
