@@ -3,6 +3,7 @@
 namespace Openl10n\Cli\Command;
 
 use GuzzleHttp\Exception\ClientException;
+use Openl10n\Cli\ServiceContainer\Exception\ConfigurationLoadingException;
 use Openl10n\Sdk\Model\Project;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -49,16 +50,15 @@ class InitCommand extends AbstractCommand
         $configurationLoader = $this->get('configuration.loader');
         $dialog = $this->getHelperSet()->get('dialog');
 
-        // Init configuration by manually read configuration file (if already exists)
-        $configPathname = $configurationLoader->getConfigurationFilepath();
-        if (is_file($configPathname)) {
-            $this->configuration = Yaml::parse($configPathname);
+        try {
+            // Init configuration by manually read configuration file (if already exists)
+            $this->configuration = $configurationLoader->loadConfiguration();
 
             // If no URL specified then don't overwrite configuration
             if (null === $url) {
                 return;
             }
-        } else {
+        } catch (ConfigurationLoadingException $e) {
             $this->configuration = [
                 'server'  => [],
                 'project' => null,
