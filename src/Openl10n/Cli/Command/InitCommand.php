@@ -21,6 +21,7 @@ class InitCommand extends AbstractCommand
     {
         $this
             ->setName('init')
+            ->setDescription('Create the configuration file and initialize the project')
             ->setDefinition(array(
                 new InputArgument('url', InputArgument::OPTIONAL, 'URL of the openl10n instance (eg. http://user:userpass@openl10n.dev)'),
                 new InputArgument('project', InputArgument::OPTIONAL, 'Slug of the project'),

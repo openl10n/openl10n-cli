@@ -15,6 +15,7 @@ class PullCommand extends AbstractCommand
     {
         $this
             ->setName('pull')
+            ->setDescription('Pull the translations from the server to the local files')
             ->addOption(
                 'locale',
                 null,

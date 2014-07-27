@@ -18,6 +18,7 @@ class PushCommand extends AbstractCommand
     {
         $this
             ->setName('push')
+            ->setDescription('Push the translations from the local files to the server')
             ->addOption(
                 'locale',
                 null,
