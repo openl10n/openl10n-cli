@@ -16,9 +16,9 @@ class FileHandler
 
         foreach ($filesConfiguration as $config) {
             $rootDir = $this->configurationLoader->getRootDirectory();
-            $pattern = $config['pattern'];
+            $matcher = new Matcher($config['pattern']);
             $options = $config['options'];
-            $fileSet = new FileSet($rootDir, $pattern, $options);
+            $fileSet = new FileSet($rootDir, $matcher, $options);
 
             $this->addFileSet($fileSet);
         }

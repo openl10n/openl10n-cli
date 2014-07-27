@@ -9,20 +9,20 @@ class FileSet
     protected $options;
 
     /**
-     * @param string $rootDirectory
-     * @param string $pattern
-     * @param array  $options
+     * @param string  $rootDirectory
+     * @param Matcher $matcher
+     * @param array   $options
      */
-    public function __construct($rootDirectory, $pattern, array $options = array())
+    public function __construct($rootDirectory, $matcher, array $options = array())
     {
         $this->rootDirectory = $rootDirectory;
-        $this->pattern = $pattern;
+        $this->matcher = $matcher;
         $this->options = $options;
     }
 
     public function getFiles()
     {
-        return (new Matcher())->match($this->pattern, $this->rootDirectory);
+        return $this->matcher->match($this->rootDirectory);
     }
 
     public function getOptions($key = null)

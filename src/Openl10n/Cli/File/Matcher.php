@@ -7,25 +7,32 @@ use Symfony\Component\Finder\Glob;
 
 class Matcher
 {
-    public function match($pattern, $inDir)
+    protected $pattern;
+
+    public function __construct($pattern)
+    {
+        $this->pattern = $pattern;
+    }
+
+    public function match($inDir)
     {
         $results = [];
 
         // Pop out placeholders from given pattern
-        preg_match_all('/<(?P<placeholder>\w+)>/', $pattern, $matches);
+        preg_match_all('/<(?P<placeholder>\w+)>/', $this->pattern, $matches);
         $placeholders = $matches['placeholder'];
 
         // Replace placeholder by a valid string
         foreach ($placeholders as $placeholder) {
-            $pattern = str_replace(
+            $this->pattern = str_replace(
                 "<${placeholder}>",
                 "___${placeholder}_placeholder___",
-                $pattern
+                $this->pattern
             );
         }
 
         // Transform pattern to regex
-        $regex = Glob::toRegex($pattern);
+        $regex = Glob::toRegex($this->pattern);
         $regex = trim($regex, '#');
 
         // Englobe every part of the regex into a matching pattern.

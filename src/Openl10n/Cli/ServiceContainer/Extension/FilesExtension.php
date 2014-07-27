@@ -33,18 +33,23 @@ class FilesExtension implements ConfiguredExtension
     public function configure(ArrayNodeDefinition $node)
     {
         $node
+            ->beforeNormalization()
+                // If config contains only a single string (without array)
+                // then convert to an array with single string.
+                ->ifString()
+                ->then(function ($v) { return array($v); })
+            ->end()
             ->prototype('array')
                 ->beforeNormalization()
+                    // Item could be abbreviated with only a single string
+                    // which is interpreted as the pattern.
                     ->ifString()
-                    ->then(function ($v) { return array('source' => $v); })
+                    ->then(function ($v) { return ['pattern' => $v]; })
                 ->end()
                 ->children()
                     ->scalarNode('pattern')
                         ->isRequired()
                     ->end()
-                    // ->scalarNode('translations')
-                    //     ->defaultNull()
-                    // ->end()
                     ->arrayNode('ignore')
                         ->beforeNormalization()
                             ->ifNull()

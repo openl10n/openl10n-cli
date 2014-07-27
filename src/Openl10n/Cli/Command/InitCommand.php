@@ -59,8 +59,11 @@ class InitCommand extends AbstractCommand
                 return;
             }
         } else {
-            $this->configuration['server'] = [];
-            $this->configuration['files'] = [];
+            $this->configuration = [
+                'server'  => [],
+                'project' => null,
+                'files'   => [],
+            ];
         }
 
         // Server
@@ -121,13 +124,13 @@ class InitCommand extends AbstractCommand
         // Files
         while (null !== $file = $dialog->ask($output, '<info>Pattern file</info> []: ')) {
             if (false !== $file) {
-                $this->configuration['files']['pattern'] = ['pattern' => $file];
+                $this->configuration['files'][] = $file;
             }
         }
 
         // Add example of file pattern
         if (empty($this->configuration['files'])) {
-            $this->configuration['files'][] = ['pattern' => 'path/to/translations.<locale>.yml'];
+            $this->configuration['files'][] = 'path/to/translations.<locale>.yml';
         }
     }
 
