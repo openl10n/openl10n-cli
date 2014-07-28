@@ -44,6 +44,7 @@ class ApplicationFactory
     protected function getDefaultExtensions()
     {
         return [
+            new Extension\CoreExtension(),
             new Extension\ServerExtension(),
             new Extension\ProjectExtension(),
             new Extension\FilesExtension(),

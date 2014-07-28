@@ -60,6 +60,7 @@ class Application extends BaseApplication
         // Default configuration.
         $container->set('application', $this);
         $container->set('configuration.loader', $this->configurationLoader);
+        $container->set('extension_manager', $this->extensionManager);
 
         // Initialize extensions.
         $this->extensionManager->initialize($container);

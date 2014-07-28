@@ -144,10 +144,7 @@ class InitCommand extends AbstractCommand
         $configurationLoader = $this->get('configuration.loader');
 
         // Dump configuration
-        $content = '';
-        foreach ($this->configuration as $name => $section) {
-            $content .= Yaml::dump([$name => $section], 4).PHP_EOL;
-        }
+        $content = $this->get('configuration.dumper')->dumpConfiguration($this->configuration);
 
         $output->writeln(['', $content]);
         if (!$dialog->askConfirmation($output, '<info>Do you confirm generation</info> [<comment>yes</comment>]? ')) {
