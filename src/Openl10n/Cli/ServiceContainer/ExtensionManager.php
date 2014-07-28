@@ -15,16 +15,19 @@ class ExtensionManager
      */
     protected $extensions;
 
+    /**
+     * @param array $extensions The extensions
+     */
     public function __construct(array $extensions = [])
     {
         $this->extensions = $extensions;
     }
 
-    public function getExtensions()
-    {
-        return $this->extensions;
-    }
-
+    /**
+     * Initialize each extension with the given container.
+     *
+     * @param ContainerInterface $container
+     */
     public function initialize(ContainerInterface $container)
     {
         foreach ($this->extensions as $extension) {
@@ -32,6 +35,15 @@ class ExtensionManager
         }
     }
 
+    /**
+     * Load more services from the extensions with the given configuration.
+     *
+     * @param array              $rawConfigs The raw configuration
+     * @param ContainerInterface $container  The service container
+     *
+     * @throws ConfigurationProcessingException If the raw configuration
+     *         contains a key which does not match any extensions
+     */
     public function load(array $rawConfigs, ContainerInterface $container)
     {
         // Validate configuration (only ConfiguredExtension are impacted)

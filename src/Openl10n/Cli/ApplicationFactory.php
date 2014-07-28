@@ -17,6 +17,11 @@ class ApplicationFactory
 
     const CONFIG_FILENAME = '.openl10n.yml';
 
+    /**
+     * Create the application.
+     *
+     * @return Application
+     */
     public function createApplication()
     {
         $configurationLoader = $this->createConfigurationLoader();
@@ -32,6 +37,9 @@ class ApplicationFactory
         return $application;
     }
 
+    /**
+     * @return array The default commands
+     */
     protected function getDefaultCommands()
     {
         return [
@@ -41,6 +49,9 @@ class ApplicationFactory
         ];
     }
 
+    /**
+     * @return array The default extensions
+     */
     protected function getDefaultExtensions()
     {
         return [
@@ -52,16 +63,25 @@ class ApplicationFactory
         ];
     }
 
+    /**
+     * @return ConfigurationLoader The configuration loader
+     */
     protected function createConfigurationLoader()
     {
         return new ConfigurationLoader(getcwd(), self::CONFIG_FILENAME);
     }
 
+    /**
+     * @return ExtensionManager The extension manager
+     */
     public function createExtensionManager()
     {
         return new ExtensionManager($this->getDefaultExtensions());
     }
 
+    /**
+     * @return EventDispatcher An EventDispatcher
+     */
     private function createEventDispatcher()
     {
         return new EventDispatcher();

@@ -4,10 +4,19 @@ namespace Openl10n\Cli\File;
 
 class FileInfo
 {
+    /**
+     * @var string
+     */
     protected $rootDirectory;
 
+    /**
+     * @var Pattern
+     */
     protected $pattern;
 
+    /**
+     * @var array
+     */
     protected $attributes;
 
     public function __construct($rootDirectory, Pattern $pattern, array $attributes)

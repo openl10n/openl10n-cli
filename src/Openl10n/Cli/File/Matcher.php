@@ -7,8 +7,14 @@ use Symfony\Component\Finder\Glob;
 
 class Matcher
 {
+    /**
+     * @var string
+     */
     protected $pattern;
 
+    /**
+     * @param string $pattern
+     */
     public function __construct($pattern)
     {
         $this->pattern = $pattern;

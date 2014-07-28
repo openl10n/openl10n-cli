@@ -7,11 +7,19 @@ use Symfony\Component\Yaml\Yaml;
 
 class ConfigurationLoader
 {
+    /**
+     * @var string
+     */
     protected $rootDirectory;
+
+    /**
+     * @var string
+     */
     protected $filename;
 
     /**
-     * @param string $filename Configuration file name
+     * @param string $rootDirectory Directory containing the config file
+     * @param string $filename      Configuration file name
      */
     public function __construct($rootDirectory, $filename)
     {
@@ -19,6 +27,11 @@ class ConfigurationLoader
         $this->filename = $filename;
     }
 
+    /**
+     * Read the config file and return the configuration array.
+     *
+     * @return array The configuration
+     */
     public function loadConfiguration()
     {
         $filepath = $this->getConfigurationFilepath();
@@ -32,16 +45,25 @@ class ConfigurationLoader
         return Yaml::parse(file_get_contents($filepath));
     }
 
-    public function getRootDirectory()
-    {
-        return $this->rootDirectory;
-    }
-
+    /**
+     * @return string The configuration filepath
+     */
     public function getConfigurationFilepath()
     {
         return $this->rootDirectory.DIRECTORY_SEPARATOR.$this->filename;
     }
 
+    /**
+     * @return string The root directory
+     */
+    public function getRootDirectory()
+    {
+        return $this->rootDirectory;
+    }
+
+    /**
+     * @param string $rootDirectory The root directory
+     */
     public function setRootDirectory($rootDirectory)
     {
         $this->rootDirectory = $rootDirectory;

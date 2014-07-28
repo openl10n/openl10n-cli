@@ -10,9 +10,32 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class Application extends BaseApplication
 {
+    /**
+     * @var ConfigurationLoader
+     */
+    protected $configurationLoader;
+
+    /**
+     * @var ExtensionManager
+     */
+    protected $extensionManager;
+
+    /**
+     * @var ContainerBuilder
+     */
     protected $container;
+
+    /**
+     * @var boolean
+     */
     protected $ignoreMissingConfiguration;
 
+    /**
+     * @param string              $name                Application name
+     * @param string              $version             Application version
+     * @param ConfigurationLoader $configurationLoader Configuration loader
+     * @param ExtensionManager    $extensionManager    Extension manager
+     */
     public function __construct($name, $version, ConfigurationLoader $configurationLoader, ExtensionManager $extensionManager)
     {
         parent::__construct($name, $version);
@@ -23,6 +46,9 @@ class Application extends BaseApplication
         $this->ignoreMissingConfiguration = false;
     }
 
+    /**
+     * @return ContainerInterface The container
+     */
     public function getContainer()
     {
         if (null === $this->container) {
@@ -50,9 +76,14 @@ class Application extends BaseApplication
      */
     public function ignoreMissingConfiguration($value = true)
     {
-        $this->ignoreMissingConfiguration = $value;
+        $this->ignoreMissingConfiguration = (bool) $value;
     }
 
+    /**
+     * Create a new container.
+     *
+     * @return ContainerInterface
+     */
     protected function createContainer()
     {
         $container = new ContainerBuilder();

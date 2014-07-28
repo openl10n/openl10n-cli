@@ -17,6 +17,9 @@ class ConfigurationTree implements ConfigurationInterface
         $this->extensions = $extensions;
     }
 
+    /**
+     * @return TreeBuilder
+     */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();

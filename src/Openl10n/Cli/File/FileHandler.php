@@ -6,7 +6,14 @@ use Openl10n\Cli\ServiceContainer\Configuration\ConfigurationLoader;
 
 class FileHandler
 {
+    /**
+     * @var ConfigurationLoader
+     */
     protected $configurationLoader;
+
+    /**
+     * @var FileSet[]
+     */
     protected $fileSets;
 
     public function __construct(ConfigurationLoader $configurationLoader, array $filesConfiguration = array())
