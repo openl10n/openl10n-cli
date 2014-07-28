@@ -122,14 +122,13 @@ class InitCommand extends AbstractCommand
             $this->configuration['project'] = $dialog->ask($output, "<info>Project's slug</info> [<comment>$project</comment>]: ", $project);
         }
 
-        // Files
-        while (null !== $file = $dialog->ask($output, '<info>Pattern file</info> []: ')) {
-            if (false !== $file) {
-                $this->configuration['files'][] = $file;
-            }
+        // If no file are already set, try to find possible ones
+        if (empty($this->configuration['files'])) {
+            $inDir = $this->get('configuration.loader')->getRootDirectory();
+            $this->configuration['files'] = $this->get('file.pattern_guess')->suggestPatterns($inDir);
         }
 
-        // Add example of file pattern
+        // If no pattern found, add example of file pattern
         if (empty($this->configuration['files'])) {
             $this->configuration['files'][] = 'path/to/translations.<locale>.yml';
         }

@@ -18,7 +18,7 @@ class ConfigurationDumper
     public function dumpConfiguration(array $config)
     {
         $content = '';
-        foreach ($this->configuration as $name => $section) {
+        foreach ($config as $name => $section) {
             $content .= Yaml::dump([$name => $section], 4).PHP_EOL;
         }
 

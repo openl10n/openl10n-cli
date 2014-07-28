@@ -13,6 +13,24 @@ class FilesExtension implements ConfiguredExtension
      */
     public function initialize(ContainerBuilder $container)
     {
+        $container
+            ->register('file.pattern_guess.symfony', 'Openl10n\Cli\File\Guess\SymfonyGuess')
+        ;
+        $container
+            ->register('file.pattern_guess.silex_kitchen_edition', 'Openl10n\Cli\File\Guess\SilexKitchenEditionGuess')
+        ;
+
+        $container
+            ->register('file.pattern_guess.composable', 'Openl10n\Cli\File\Guess\ComposableGuess')
+            ->addArgument([
+                new Reference('file.pattern_guess.symfony'),
+                new Reference('file.pattern_guess.silex_kitchen_edition'),
+            ])
+        ;
+
+        $container
+            ->setAlias('file.pattern_guess', 'file.pattern_guess.composable')
+        ;
     }
 
     /**
