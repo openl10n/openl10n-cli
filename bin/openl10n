@@ -4,6 +4,6 @@
 require __DIR__.'/../vendor/autoload.php';
 
 (new Openl10n\Cli\ApplicationFactory())
-	->createApplication()
-	->run()
+    ->createApplication()
+    ->run()
 ;
