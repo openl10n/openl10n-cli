@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2a7d46fe88bbc4852fde07c50962e791",
+    "hash": "f3cb1b62efb8ecb2f41f7e1e30cff4e6",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -130,12 +130,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/openl10n/openl10n-sdk.git",
-                "reference": "cb679a1d84ce7b4615917a4305486f13ee8c0123"
+                "reference": "9fda6cbf09b4c22816ade261bfddfb6df72d1ac4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openl10n/openl10n-sdk/zipball/cb679a1d84ce7b4615917a4305486f13ee8c0123",
-                "reference": "cb679a1d84ce7b4615917a4305486f13ee8c0123",
+                "url": "https://api.github.com/repos/openl10n/openl10n-sdk/zipball/9fda6cbf09b4c22816ade261bfddfb6df72d1ac4",
+                "reference": "9fda6cbf09b4c22816ade261bfddfb6df72d1ac4",
                 "shasum": ""
             },
             "require": {
@@ -155,11 +155,12 @@
                 {
                     "name": "Matthieu Moquet",
                     "email": "matthieu@moquet.net",
-                    "homepage": "http://moquet.net"
+                    "homepage": "http://moquet.net",
+                    "role": "Developer"
                 }
             ],
             "description": "The API client for openl10n",
-            "time": "2014-07-25 13:29:59"
+            "time": "2014-07-11 14:16:05"
         },
         {
             "name": "symfony/config",
@@ -540,6 +541,8 @@
     "stability-flags": {
         "openl10n/sdk": 20
     },
-    "platform": [],
+    "platform": {
+        "php": ">=5.4"
+    },
     "platform-dev": []
 }

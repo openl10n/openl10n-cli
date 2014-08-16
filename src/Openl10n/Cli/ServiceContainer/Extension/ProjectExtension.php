@@ -1,45 +1,47 @@
 <?php
 
-namespace Openl10n\Cli\DependencyInjection\Extension;
+namespace Openl10n\Cli\ServiceContainer\Extension;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
-class ProjectExtension implements ExtensionInterface
+class ProjectExtension implements ConfiguredExtension
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function initialize(ContainerBuilder $container)
+    {
+    }
+
     /**
      * {@inheritdoc}
      */
     public function load(array $config, ContainerBuilder $container)
     {
         $container
-            ->register('openl10n.project_handler', 'Openl10n\Cli\Project\ProjectHandler')
-            ->addArgument(new Reference('openl10n.api'))
-            ->addArgument($config['id'])
+            ->register('project_handler', 'Openl10n\Cli\Project\ProjectHandler')
+            ->addArgument($config['slug'])
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefinition(ArrayNodeDefinition $node)
+    public function configure(ArrayNodeDefinition $node)
     {
         $node
             ->beforeNormalization()
             ->ifString()
                 ->then(function ($v) { return array(
-                    'id' => $v
+                    'slug' => $v
                 ); })
             ->end()
             ->children()
-                ->scalarNode('id')
+                ->scalarNode('slug')
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                // ->arrayNode('locales')
-                //     ->prototype('scalar')->end()
-                // ->end()
             ->end();
     }
 

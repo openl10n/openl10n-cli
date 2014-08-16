@@ -1,20 +1,27 @@
 <?php
 
-namespace Openl10n\Cli\DependencyInjection\Extension;
+namespace Openl10n\Cli\ServiceContainer\Extension;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ServerExtension implements ExtensionInterface
+class ServerExtension implements ConfiguredExtension
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function initialize(ContainerBuilder $container)
+    {
+    }
+
     /**
      * {@inheritdoc}
      */
     public function load(array $config, ContainerBuilder $container)
     {
         $container
-            ->register('openl10n.api.config', 'Openl10n\Sdk\Config')
+            ->register('api.config', 'Openl10n\Sdk\Config')
             ->addArgument($config['hostname'])
             ->addArgument($config['use_ssl'])
             ->addArgument($config['port'])
@@ -22,15 +29,15 @@ class ServerExtension implements ExtensionInterface
         ;
 
         $container
-            ->register('openl10n.api', 'Openl10n\Sdk\Api')
-            ->addArgument(new Reference('openl10n.api.config'))
+            ->register('api', 'Openl10n\Sdk\Api')
+            ->addArgument(new Reference('api.config'))
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefinition(ArrayNodeDefinition $node)
+    public function configure(ArrayNodeDefinition $node)
     {
         $node
             ->beforeNormalization()

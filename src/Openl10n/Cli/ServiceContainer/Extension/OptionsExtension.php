@@ -1,12 +1,19 @@
 <?php
 
-namespace Openl10n\Cli\DependencyInjection\Extension;
+namespace Openl10n\Cli\ServiceContainer\Extension;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OptionsExtension implements ExtensionInterface
+class OptionsExtension implements ConfiguredExtension
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function initialize(ContainerBuilder $container)
+    {
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -17,7 +24,7 @@ class OptionsExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function setDefinition(ArrayNodeDefinition $node)
+    public function configure(ArrayNodeDefinition $node)
     {
         $node
             ->beforeNormalization()

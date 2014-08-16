@@ -2,28 +2,27 @@
 
 namespace Openl10n\Cli\Listener;
 
-use Openl10n\Cli\Application;
 use Openl10n\Cli\Command\AbstractCommand;
+use Openl10n\Cli\ServiceContainer\Configuration\ConfigurationLoader;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WorkingDirectoryListener implements EventSubscriberInterface
 {
-    protected $application;
+    protected $configurKationLoader;
+
+    public function __construct(ConfigurationLoader $configurationLoader)
+    {
+        $this->configurationLoader = $configurationLoader;
+    }
 
     public static function getSubscribedEvents()
     {
         return array(
             ConsoleEvents::COMMAND => array('onConsoleCommand', 10),
         );
-    }
-
-    public function setApplication(Application $application)
-    {
-        $this->application = $application;
     }
 
     public function onConsoleCommand(ConsoleCommandEvent $event)
@@ -44,7 +43,7 @@ class WorkingDirectoryListener implements EventSubscriberInterface
         }
 
         if (null !== $workingDir = $input->getOption('working-dir')) {
-            $this->application->setWorkingDirectory($workingDir);
+            $this->configurationLoader->setRootDirectory($workingDir);
         }
     }
 }

@@ -15,6 +15,7 @@ class PullCommand extends AbstractCommand
     {
         $this
             ->setName('pull')
+            ->setDescription('Pull the translations from the server to the local files')
             ->addOption(
                 'locale',
                 null,
@@ -30,81 +31,81 @@ class PullCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $projectHandler = $this->get('openl10n.project_handler');
+        $api = $this->get('api');
+        $projectApi = $api->getEntryPoint('project');
+        $resourceApi = $api->getEntryPoint('resource');
 
         //
         // Get project
         //
-        try {
-            $project = $projectHandler->getProject();
-        } catch (\Exception $e) {
-            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
-
-            return 1;
-        }
+        $projectSlug = $this->get('project_handler')->getProjectSlug();
+        $project = $projectApi->get($projectSlug);
 
         //
         // Get project locales
         //
-        $languages = $projectHandler->getProjectLanguages();
-        $projectLocales = array_map(function($language) {
+        $languages = $projectApi->getLanguages($project->getSlug());
+        $projectLocales = array_map(function ($language) {
             return $language->getLocale();
         }, $languages);
 
         $defaultLocale = $project->getDefaultLocale();
 
         // Retrieve locales option
-        $locales = $input->getOption('locale');
-        $locales = array_unique($locales);
+        $localesToPull = $input->getOption('locale');
+        $localesToPull = array_unique($localesToPull);
 
         // Process locales special cases
-        if (in_array('all', $locales)) {
-            $locales = $projectLocales;
-        } elseif (false !== $key = array_search('default', $locales)) {
-            unset($locales[$key]);
-            $locales[] = $defaultLocale;
+        if (in_array('all', $localesToPull)) {
+            $localesToPull = $projectLocales;
+        } elseif (false !== $key = array_search('default', $localesToPull)) {
+            unset($localesToPull[$key]);
+            $localesToPull[] = $defaultLocale;
         }
 
         // Deduplicate values
-        $locales = array_unique($locales);
+        $localesToPull = array_unique($localesToPull);
 
         //
         // Retrieve existing project's resources
         //
-        $resourceApi = $this->get('openl10n.api')->getEntryPoint('resource');
         $resources = $resourceApi->findByProject($project);
+        // Set resources' pathname as array key
+        $resources = array_combine(array_map(function ($resource) {
+            return $resource->getPathname();
+        }, $resources), $resources);
 
         //
         // Iterate over resources
         //
-        $resourcesHandler = $this->get('openl10n.resources_handler');
-        $resourceDefinitions = $resourcesHandler->getResourceDefinitions();
-        $resourceDefinitions = array_combine(array_map(function($resourceDef) use ($defaultLocale) {
-            return $resourceDef->getPathnameForLocale($defaultLocale);
-        }, $resourceDefinitions), $resourceDefinitions);
+        $fileSets = $this->get('file_handler')->getFileSets();
 
-        $rootDir = $this->getApplication()->getWorkingDirectory();
+        foreach ($fileSets as $fileSet) {
+            $files = $fileSet->getFiles();
+            $options = $fileSet->getOptions('pull');
 
-        foreach ($resources as $resource) {
-            $resourcePathname = $resource->getPathname();
+            $resourcesToPull = [];
 
-            if (isset($resourceDefinitions[$resourcePathname])) {
-                $definition = $resourceDefinitions[$resourcePathname];
-            } else {
-                $output->writeln(sprintf('Skipping resource %s', $resourcePathname));
-                continue;
-            }
+            foreach ($files as $file) {
+                $resourceIdentifier = $file->getPathname(['locale' => $defaultLocale]);
+                $locale = $file->getAttribute('locale');
 
-            //
-            // Download files
-            //
-            foreach ($locales as $locale) {
-                $pathname = $definition->getPathnameForLocale($locale);
+                if (!isset($resources[$resourceIdentifier])) {
+                    $output->writeln(sprintf('Skipping file %s', $file->getRelativePathname()));
+                    continue;
+                }
 
-                $output->writeln(sprintf('<info>Downloading</info> file <comment>%s</comment>', $pathname));
-                $content = $resourceApi->export($resource, $locale);
+                $resource = $resources[$resourceIdentifier];
 
-                file_put_contents($rootDir.'/'.$pathname, $content);
+                // Ignore non specified locales
+                if (!in_array($locale, $localesToPull)) {
+                    continue;
+                }
+
+                $output->writeln(sprintf('<info>Downloading</info> file <comment>%s</comment>', $file->getRelativePathname()));
+                $content = $resourceApi->export($resource, $locale, $options);
+
+                file_put_contents($file->getAbsolutePathname(), $content);
             }
         }
     }
