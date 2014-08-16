@@ -124,7 +124,7 @@ class InitCommand extends AbstractCommand
         }
 
         // If no file are already set, try to find possible ones
-        if (null !== $patterns = $input->getArgument('pattern')) {
+        if (array() !== $patterns = $input->getArgument('pattern')) {
             $this->configuration['files'] = $patterns;
         } elseif (empty($this->configuration['files'])) {
             $inDir = $this->get('configuration.loader')->getRootDirectory();
