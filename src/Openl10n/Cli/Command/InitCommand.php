@@ -25,6 +25,7 @@ class InitCommand extends AbstractCommand
             ->setDefinition(array(
                 new InputArgument('url', InputArgument::OPTIONAL, 'URL of the openl10n instance (eg. http://user:userpass@openl10n.dev)'),
                 new InputArgument('project', InputArgument::OPTIONAL, 'Slug of the project'),
+                new InputArgument('pattern', InputArgument::OPTIONAL|InputArgument::IS_ARRAY, 'Pattern of the translation files'),
             ))
         ;
     }
@@ -123,7 +124,9 @@ class InitCommand extends AbstractCommand
         }
 
         // If no file are already set, try to find possible ones
-        if (empty($this->configuration['files'])) {
+        if (null !== $patterns = $input->getArgument('pattern')) {
+            $this->configuration['files'] = $patterns;
+        } elseif (empty($this->configuration['files'])) {
             $inDir = $this->get('configuration.loader')->getRootDirectory();
             $this->configuration['files'] = $this->get('file.pattern_guess')->suggestPatterns($inDir);
         }
