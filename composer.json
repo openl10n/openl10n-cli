@@ -5,7 +5,7 @@
     "type": "project",
     "require": {
         "php": ">=5.4",
-        "openl10n/sdk": "dev-master",
+        "openl10n/sdk": "~0.1",
         "symfony/config": "~2.4",
         "symfony/console": "~2.4",
         "symfony/event-dispatcher": "~2.4",
