@@ -12,7 +12,7 @@ mv openl10n.phar /usr/local/bin/openl10n
 
 ## Usage
 
-Write a `openl10n.yml` file on the root of your project:
+Write a `.openl10n.yml` file on the root of your project:
 
 ```yaml
 # Server configuration
@@ -31,6 +31,28 @@ files:
     # Example of patterns for a standard Symfony application
     - pattern: app/Resources/translations/*.<locale>.*
     - pattern: src/*Bundle/Resources/translations/*.<locale>.*
+```
+
+If you use versionning with this configuration file then it's better to specify
+server credentials outside of the project.
+
+You can use an alias in the `.openl10n.yml` file:
+
+```yaml
+# Server configuration
+server: foobar
+```
+
+and reference the credentials for this alias into the
+`$HOME/.openl10n/server.conf` file:
+
+```yaml
+[foobar]
+hostname: openl10n.dev
+port: 80
+use_ssl: true
+username: user
+password: userpass
 ```
 
 Upload translations:
