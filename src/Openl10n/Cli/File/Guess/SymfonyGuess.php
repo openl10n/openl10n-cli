@@ -16,10 +16,10 @@ class SymfonyGuess implements PatternGuess
         return $this->getPossiblePatterns();
     }
 
-    public function getPossiblePatterns()
+    protected function getPossiblePatterns()
     {
         return [
-            'src/*/Bundle/*Bundle/Resources/translations/.<locale>.*',
+            'src/*/Bundle/*Bundle/Resources/translations/*.<locale>.*',
             'src/*/*Bundle/Resources/translations/*.<locale>.*',
             'app/Resources/translations/*.<locale>.*',
         ];
