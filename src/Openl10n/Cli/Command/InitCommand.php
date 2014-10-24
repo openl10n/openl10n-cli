@@ -119,7 +119,7 @@ class InitCommand extends AbstractCommand
         if (null !== $projectSlug = $input->getArgument('project')) {
             $this->configuration['project'] = $projectSlug;
         } elseif (!isset($this->configuration['project'])) {
-            $project = basename(realpath($configurationLoader->getRootDirectory()));
+            $project = strtolower(basename(realpath($configurationLoader->getRootDirectory())));
             $this->configuration['project'] = $dialog->ask($output, "<info>Project's slug</info> [<comment>$project</comment>]: ", $project);
         }
 
