@@ -84,15 +84,18 @@ class Matcher
                 }
             }
 
+
             $filePattern = '';
             $placeholderStack = $placeholders; // make copy of placeholders
-            while ($part = array_shift($parts)) {
+
+            do {
+                $part = array_shift($parts);
                 $filePattern .= $part;
 
                 if (null !== $placeholder = array_shift($placeholderStack)) {
                     $filePattern .= "<${placeholder}>";
                 }
-            }
+            } while(null !== $part);
 
             $results[] = new FileInfo(
                 $inDir,
