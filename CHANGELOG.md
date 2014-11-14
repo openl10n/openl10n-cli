@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Allow to overwrite the configuration filepath via the `--config-file` option
+
 ## 0.1.1 - 2014-11-14
 
 Bug fixes.

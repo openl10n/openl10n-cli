@@ -31,7 +31,11 @@ class WorkingDirectoryListener implements EventSubscriberInterface
         $inputDefinition = $event->getCommand()->getApplication()->getDefinition();
 
         $inputDefinition->addOption(
-            new InputOption('working-dir', null, InputOption::VALUE_REQUIRED, 'The directory of the configuration file', null)
+            new InputOption('working-dir', null, InputOption::VALUE_REQUIRED, 'The root directory of the project', null)
+        );
+
+        $inputDefinition->addOption(
+            new InputOption('config-file', null, InputOption::VALUE_REQUIRED, 'The filepath of the configuration file', null)
         );
 
         $event->getCommand()->mergeApplicationDefinition();
@@ -44,6 +48,10 @@ class WorkingDirectoryListener implements EventSubscriberInterface
 
         if (null !== $workingDir = $input->getOption('working-dir')) {
             $this->configurationLoader->setRootDirectory($workingDir);
+        }
+
+        if (null !== $configPath = $input->getOption('config-file')) {
+            $this->configurationLoader->setConfigurationFilepath($configPath);
         }
     }
 }

@@ -15,6 +15,11 @@ class ConfigurationLoader
     /**
      * @var string
      */
+    protected $configFilepath;
+
+    /**
+     * @var string
+     */
     protected $filename;
 
     /**
@@ -50,7 +55,15 @@ class ConfigurationLoader
      */
     public function getConfigurationFilepath()
     {
-        return $this->rootDirectory.DIRECTORY_SEPARATOR.$this->filename;
+        return $this->configFilepath ?: $this->rootDirectory.DIRECTORY_SEPARATOR.$this->filename;
+    }
+
+    /**
+     * @param $configFilepath string The configuration filepath
+     */
+    public function setConfigurationFilepath($configFilepath)
+    {
+        $this->configFilepath = $configFilepath;
     }
 
     /**
