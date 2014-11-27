@@ -45,6 +45,11 @@ class InitCommand extends AbstractCommand
 
         if (null !== $url = $input->getArgument('url')) {
             $urlParts = parse_url($url);
+
+            if (false === $urlParts) {
+                throw new InvalidArgumentException("$url is not a valid URL");
+            }
+
             $server = array_merge($server, $urlParts);
         }
 
