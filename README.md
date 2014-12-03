@@ -2,12 +2,31 @@
 
 ## Install
 
-Build the PHAR file using [Box Project](http://box-project.org/).
+Download the last PHAR file from the [releases panel](https://github.com/openl10n/openl10n-cli/releases)
+and add it to your `$PATH`:
 
+```shell
+VERSION=vX.X.X
+curl -LO "https://github.com/openl10n/openl10n-cli/releases/download/${VERSION}/openl10n.phar"
+chmod +x openl10n.phar
+mv openl10n.phar /usr/local/bin/openl10n
 ```
+
+Or clone the source and build it manually using [Composer](https://getcomposer.org/)
+and [Box Project](http://box-project.org/).
+
+```shell
+git clone https://github.com/openl10n/openl10n-cli.git; cd openl10n-cli
 composer install
 box build
 mv openl10n.phar /usr/local/bin/openl10n
+```
+
+You can also include it directly in a PHP project by adding it in your Composer
+dependencies:
+
+```shell
+composer require openl10n/cli
 ```
 
 ## Usage
