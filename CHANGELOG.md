@@ -2,9 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.2.0 - 2014-12-03
 
 - Allow to overwrite the configuration filepath via the `--config-file` option
+- Allow binary to be included in existing project
 
 ## 0.1.1 - 2014-11-14
 
