@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Allow `init` command to be used in non-interactive mode
+
 ## 0.2.0 - 2014-12-03
 
 - Allow to overwrite the configuration filepath via the `--config-file` option

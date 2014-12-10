@@ -33,8 +33,28 @@ class InitCommand extends AbstractCommand
     /**
      * {@inheritdoc}
      */
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output)
     {
+        //
+        // First try to read the configuration file if exists
+        //
+        $this->getApplication()->ignoreMissingConfiguration();
+        $configurationLoader = $this->get('configuration.loader');
+
+        try {
+            // Init configuration by manually read configuration file (if already exists)
+            $this->configuration = $configurationLoader->loadConfiguration();
+        } catch (ConfigurationLoadingException $e) {
+            $this->configuration = [
+                'server'  => [],
+                'project' => null,
+                'files'   => [],
+            ];
+        }
+
+        //
+        // Then add config from input
+        //
         $server = [
             'scheme' => null,
             'user' => null,
@@ -53,37 +73,12 @@ class InitCommand extends AbstractCommand
             $server = array_merge($server, $urlParts);
         }
 
-        $this->getApplication()->ignoreMissingConfiguration();
-        $configurationLoader = $this->get('configuration.loader');
-        $dialog = $this->getHelperSet()->get('dialog');
-
-        try {
-            // Init configuration by manually read configuration file (if already exists)
-            $this->configuration = $configurationLoader->loadConfiguration();
-
-            // If no URL specified then don't overwrite configuration
-            if (null === $url) {
-                return;
-            }
-        } catch (ConfigurationLoadingException $e) {
-            $this->configuration = [
-                'server'  => [],
-                'project' => null,
-                'files'   => [],
-            ];
-        }
-
-        // Server
         if (null !== $hostname = $server['host']) {
             $this->configuration['server']['hostname'] = $hostname;
-        } elseif (!isset($this->configuration['server']['hostname'])) {
-            $this->configuration['server']['hostname'] = $dialog->ask($output, '<info>Hostname</info> [<comment>openl10n.dev</comment>]: ', 'openl10n.dev');
         }
 
         if (null !== $scheme = $server['scheme']) {
             $this->configuration['server']['use_ssl'] = 'https' === $scheme;
-        } elseif (!isset($this->configuration['server']['use_ssl'])) {
-            $this->configuration['server']['use_ssl'] = $dialog->askConfirmation($output, '<info>Enable ssl</info> [<comment>no</comment>]? ', false);
         }
 
         if (false === $this->configuration['server']['use_ssl']) {
@@ -96,14 +91,58 @@ class InitCommand extends AbstractCommand
 
         if (null !== $username = $server['user']) {
             $this->configuration['server']['username'] = $username;
-        } elseif (!isset($this->configuration['server']['username'])) {
-            $currentUser = get_current_user();
-            $this->configuration['server']['username'] = $dialog->ask($output, "<info>Username</info> [<comment>$currentUser</comment>]: ", $currentUser);
         }
 
         if (null !== $password = $server['pass']) {
             $this->configuration['server']['password'] = $password;
-        } elseif (!isset($this->configuration['server']['password'])) {
+        }
+
+        if (null !== $projectSlug = $input->getArgument('project')) {
+            $this->configuration['project'] = $projectSlug;
+        }
+
+        if (array() !== $patterns = $input->getArgument('pattern')) {
+            $this->configuration['files'] = $patterns;
+        }
+
+        // If no file are already set, try to find possible ones
+        if (empty($this->configuration['files'])) {
+            $inDir = $this->get('configuration.loader')->getRootDirectory();
+            $this->configuration['files'] = $this->get('file.pattern_guess')->suggestPatterns($inDir);
+        }
+
+        // If no pattern found, add example of file pattern
+        if (empty($this->configuration['files'])) {
+            $this->configuration['files'][] = 'path/to/translations.<locale>.yml';
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function interact(InputInterface $input, OutputInterface $output)
+    {
+        $dialog = $this->getHelperSet()->get('dialog');
+
+        // Server
+        if (!isset($this->configuration['server']['hostname'])) {
+            $this->configuration['server']['hostname'] = $dialog->ask($output, '<info>Hostname</info> [<comment>openl10n.dev</comment>]: ', 'openl10n.dev');
+        }
+
+        if (!isset($this->configuration['server']['use_ssl'])) {
+            $this->configuration['server']['use_ssl'] = $dialog->askConfirmation($output, '<info>Enable ssl</info> [<comment>no</comment>]? ', false);
+        }
+
+        if (false === $this->configuration['server']['use_ssl']) {
+            unset($this->configuration['server']['use_ssl']);
+        }
+
+        if (!isset($this->configuration['server']['username'])) {
+            $currentUser = get_current_user();
+            $this->configuration['server']['username'] = $dialog->ask($output, "<info>Username</info> [<comment>$currentUser</comment>]: ", $currentUser);
+        }
+
+        if (!isset($this->configuration['server']['password'])) {
             $currentUser = get_current_user();
             $this->configuration['server']['password'] = $dialog->askHiddenResponseAndValidate(
                 $output,
@@ -121,24 +160,9 @@ class InitCommand extends AbstractCommand
         }
 
         // Project
-        if (null !== $projectSlug = $input->getArgument('project')) {
-            $this->configuration['project'] = $projectSlug;
-        } elseif (!isset($this->configuration['project'])) {
+        if (!isset($this->configuration['project'])) {
             $project = strtolower(basename(realpath($configurationLoader->getRootDirectory())));
             $this->configuration['project'] = $dialog->ask($output, "<info>Project's slug</info> [<comment>$project</comment>]: ", $project);
-        }
-
-        // If no file are already set, try to find possible ones
-        if (array() !== $patterns = $input->getArgument('pattern')) {
-            $this->configuration['files'] = $patterns;
-        } elseif (empty($this->configuration['files'])) {
-            $inDir = $this->get('configuration.loader')->getRootDirectory();
-            $this->configuration['files'] = $this->get('file.pattern_guess')->suggestPatterns($inDir);
-        }
-
-        // If no pattern found, add example of file pattern
-        if (empty($this->configuration['files'])) {
-            $this->configuration['files'][] = 'path/to/translations.<locale>.yml';
         }
     }
 
@@ -153,7 +177,10 @@ class InitCommand extends AbstractCommand
         // Dump configuration
         $content = $this->get('configuration.dumper')->dumpConfiguration($this->configuration);
 
-        $output->writeln(['', $content]);
+        if ($input->isInteractive()) {
+            $output->writeln(['', $content]);
+        }
+
         if (!$dialog->askConfirmation($output, '<info>Do you confirm generation</info> [<comment>yes</comment>]? ')) {
             return 1;
         }
