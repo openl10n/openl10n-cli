@@ -5,7 +5,8 @@
     ],
     "files": [
         "LICENSE",
-        "./vendor/guzzlehttp/guzzle/src/cacert.pem"
+        "./vendor/guzzlehttp/guzzle/src/cacert.pem",
+        "./vendor/herrera-io/phar-update/res/schema.json"
     ],
     "finder": [
         {
