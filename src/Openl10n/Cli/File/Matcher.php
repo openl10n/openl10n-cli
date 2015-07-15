@@ -65,7 +65,11 @@ class Matcher
         $finder = new Finder();
         $finder->in($inDir)->path($regex);
         foreach ($finder->files() as $file) {
-            if (!preg_match($regex, $file->getRelativePathname(), $matches)) {
+            
+            // Replacing Windows backslashes by linux slashes
+            $relativePathnameSanitized = str_replace("\\", "/", $file->getRelativePathname());
+            
+            if (!preg_match($regex, $relativePathnameSanitized, $matches)) {
                 // Should not happen, but it better to check
                 continue;
             }
