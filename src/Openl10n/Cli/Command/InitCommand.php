@@ -161,7 +161,7 @@ class InitCommand extends AbstractCommand
 
         // Project
         if (!isset($this->configuration['project'])) {
-            $project = strtolower(basename(realpath($configurationLoader->getRootDirectory())));
+            $project = strtolower(basename(realpath($this->get('configuration.loader')->getRootDirectory())));
             $this->configuration['project'] = $dialog->ask($output, "<info>Project's slug</info> [<comment>$project</comment>]: ", $project);
         }
     }
