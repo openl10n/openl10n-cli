@@ -1,2 +1,4 @@
 /vendor/
 /openl10n.phar
+/bin/
+!/bin/openl10n
