@@ -5,7 +5,7 @@ namespace Openl10n\Cli\File;
 class FileSet
 {
     protected $rootDirectory;
-    protected $pattern;
+    protected $matcher;
     protected $options;
 
     /**
@@ -13,7 +13,7 @@ class FileSet
      * @param Matcher $matcher
      * @param array   $options
      */
-    public function __construct($rootDirectory, $matcher, array $options = array())
+    public function __construct($rootDirectory, Matcher $matcher, array $options = array())
     {
         $this->rootDirectory = $rootDirectory;
         $this->matcher = $matcher;
