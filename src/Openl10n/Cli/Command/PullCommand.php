@@ -2,6 +2,7 @@
 
 namespace Openl10n\Cli\Command;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,6 +23,11 @@ class PullCommand extends AbstractCommand
                 InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
                 'The locale id, "default" for the source, "all" for every locales found',
                 ['default']
+            )
+            ->addArgument(
+                'files',
+                InputArgument::IS_ARRAY,
+                'File list you want to pull from the server'
             )
         ;
     }
@@ -79,6 +85,7 @@ class PullCommand extends AbstractCommand
         // Iterate over resources
         //
         $fileSets = $this->get('file_handler')->getFileSets();
+        $fileFilter = $input->getArgument('files');
 
         foreach ($fileSets as $fileSet) {
             $files = $fileSet->getFiles();
@@ -89,6 +96,11 @@ class PullCommand extends AbstractCommand
             foreach ($files as $file) {
                 $resourceIdentifier = $file->getPathname(['locale' => $defaultLocale]);
                 $locale = $file->getAttribute('locale');
+
+                // Skip unwanted files
+                if (!empty($fileFilter) && !in_array($file->getRelativePathname(), $fileFilter)) {
+                    continue;
+                }
 
                 if (!isset($resources[$resourceIdentifier])) {
                     $output->writeln(sprintf('Skipping file %s', $file->getRelativePathname()));

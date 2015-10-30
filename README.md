@@ -96,6 +96,14 @@ You can select the files you want to push to the server by adding a file name li
 openl10n push --locale=all app/Resources/fr.yml config/translations/de.yml
 ```
 
+### Select files to download
+
+Same thing here:
+
+```shell
+openl10n pull --locale=all app/Resources/fr.yml config/translations/de.yml
+```
+
 ## License
 
 OpenLocalization is released under the MIT License.
