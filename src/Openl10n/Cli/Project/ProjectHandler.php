@@ -4,7 +4,7 @@ namespace Openl10n\Cli\Project;
 
 class ProjectHandler
 {
-    protected $projectId;
+    protected $projectSlug;
 
     /**
      * @param string $projectSlug
@@ -14,6 +14,9 @@ class ProjectHandler
         $this->projectSlug = $projectSlug;
     }
 
+    /**
+     * @return string
+     */
     public function getProjectSlug()
     {
         return $this->projectSlug;
