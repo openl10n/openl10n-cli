@@ -1,5 +1,7 @@
 # OpenLocalization CLI tool
 
+[![Build status...](https://img.shields.io/travis/openl10n/openl10n-cli.svg)](http://travis-ci.org/openl10n/openl10n-cli)
+
 ## Install
 
 Download the last PHAR file from the [releases panel](https://github.com/openl10n/openl10n-cli/releases)
