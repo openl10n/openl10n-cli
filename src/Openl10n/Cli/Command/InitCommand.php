@@ -81,7 +81,7 @@ class InitCommand extends AbstractCommand
             $this->configuration['server']['use_ssl'] = 'https' === $scheme;
         }
 
-        if (false === $this->configuration['server']['use_ssl']) {
+        if (isset($this->configuration['server']['use_ssl']) && false === $this->configuration['server']['use_ssl']) {
             unset($this->configuration['server']['use_ssl']);
         }
 
