@@ -4,5 +4,9 @@ php:
   - 5.5
   - 5.4
 before_script:
+  - composer selfupdate
   - composer install
+  - export PATH=./bin:$PATH
+
 script: composer test
+

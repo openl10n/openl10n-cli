@@ -25,7 +25,7 @@
     "scripts": {
         "test": [
             "phpunit --colors=always",
-            "bin/behat --format=progress"
+            "behat --format=progress"
         ]
     },
     "bin": [
