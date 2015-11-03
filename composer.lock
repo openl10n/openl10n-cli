@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "523458c4da5b0748db25d76d36641436",
+    "hash": "0cd1a6538edacf27d02ecd25fa32f942",
     "content-hash": "4b7769ac1fc0bf33c8d614cb3fc476ca",
     "packages": [
         {
@@ -122,16 +122,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "4ef919b0cf3b1989523138b60163bbcb7ba1ff7e"
+                "reference": "4d0bdbe1206df7440219ce14c972aa57cc5e4982"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/4ef919b0cf3b1989523138b60163bbcb7ba1ff7e",
-                "reference": "4ef919b0cf3b1989523138b60163bbcb7ba1ff7e",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/4d0bdbe1206df7440219ce14c972aa57cc5e4982",
+                "reference": "4d0bdbe1206df7440219ce14c972aa57cc5e4982",
                 "shasum": ""
             },
             "require": {
@@ -176,7 +176,7 @@
                 "stream",
                 "uri"
             ],
-            "time": "2015-08-15 19:32:36"
+            "time": "2015-11-03 01:34:55"
         },
         {
             "name": "openl10n/sdk",
@@ -184,12 +184,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/openl10n/openl10n-sdk.git",
-                "reference": "c268c024ff2e0ea1b41a59cc7427f9a06084c6db"
+                "reference": "2eab19e57f9cc35bc39e39b970c950be09679ff5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openl10n/openl10n-sdk/zipball/c268c024ff2e0ea1b41a59cc7427f9a06084c6db",
-                "reference": "c268c024ff2e0ea1b41a59cc7427f9a06084c6db",
+                "url": "https://api.github.com/repos/openl10n/openl10n-sdk/zipball/2eab19e57f9cc35bc39e39b970c950be09679ff5",
+                "reference": "2eab19e57f9cc35bc39e39b970c950be09679ff5",
                 "shasum": ""
             },
             "require": {
@@ -213,7 +213,7 @@
                 }
             ],
             "description": "The API client for openl10n",
-            "time": "2015-10-08 06:47:28"
+            "time": "2015-11-03 12:43:59"
         },
         {
             "name": "psr/http-message",
