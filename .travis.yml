@@ -5,7 +5,6 @@ php:
 before_script:
   - composer selfupdate
   - composer install
-  - export PATH=./bin:$PATH
 
 script: composer test
 
