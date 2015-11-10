@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 - Allow `init` command to be used in non-interactive mode
+- Add possibility to pull specific files
+- Remove compatibility with PHP 5.4
 
 ## 0.2.0 - 2014-12-03
 
