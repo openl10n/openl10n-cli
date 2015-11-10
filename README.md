@@ -1,6 +1,11 @@
 # OpenLocalization CLI tool
 
 [![Build status...](https://img.shields.io/travis/openl10n/openl10n-cli.svg)](http://travis-ci.org/openl10n/openl10n-cli)
+[![Code quality...](https://img.shields.io/scrutinizer/g/openl10n/openl10n-cli.svg)](https://scrutinizer-ci.com/g/openl10n/openl10n-cli/)
+[![License MIT](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/openl10n/openl10n-cli/blob/master/LICENSE)
+[![Packagist](http://img.shields.io/packagist/v/openl10n/cli.svg)](https://packagist.org/packages/openl10n/cli)
+[![Dependency Status](https://www.versioneye.com/user/projects/543ce51864e43a34a3000031/badge.svg)](https://www.versioneye.com/user/projects/543ce51864e43a34a3000031)
+
 
 ## Install
 
