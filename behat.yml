@@ -1,0 +1,7 @@
+default:
+    suites:
+        cli:
+            paths:
+                - features/cli
+            contexts:
+                - FeatureContext

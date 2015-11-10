@@ -4,8 +4,8 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^5.4",
-        "openl10n/sdk": "^0.1",
+        "php": "^5.5",
+        "openl10n/sdk": "^0.2",
         "symfony/config": "^2.7",
         "symfony/console": "^2.7",
         "symfony/dependency-injection": "^2.7",
@@ -14,7 +14,8 @@
         "symfony/yaml": "^2.7"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8"
+        "phpunit/phpunit": "^4.8",
+        "behat/behat": "^3.0"
     },
     "autoload": {
         "psr-4": {
@@ -23,7 +24,8 @@
     },
     "scripts": {
         "test": [
-            "phpunit --colors=always"
+            "phpunit --colors=always",
+            "behat --format=progress --colors --verbose"
         ]
     },
     "bin": [
