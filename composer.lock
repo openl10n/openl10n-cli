@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0cd1a6538edacf27d02ecd25fa32f942",
-    "content-hash": "4b7769ac1fc0bf33c8d614cb3fc476ca",
+    "hash": "ca36e5ca885f769fa88ae004c7f63f62",
+    "content-hash": "ec47903e8da5f5de3f0b0c18ead50adf",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -180,16 +180,16 @@
         },
         {
             "name": "openl10n/sdk",
-            "version": "dev-master",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/openl10n/openl10n-sdk.git",
-                "reference": "2eab19e57f9cc35bc39e39b970c950be09679ff5"
+                "reference": "1a67c167bf42fefb59d353b1cdcbd9bca1578eef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openl10n/openl10n-sdk/zipball/2eab19e57f9cc35bc39e39b970c950be09679ff5",
-                "reference": "2eab19e57f9cc35bc39e39b970c950be09679ff5",
+                "url": "https://api.github.com/repos/openl10n/openl10n-sdk/zipball/1a67c167bf42fefb59d353b1cdcbd9bca1578eef",
+                "reference": "1a67c167bf42fefb59d353b1cdcbd9bca1578eef",
                 "shasum": ""
             },
             "require": {
@@ -213,7 +213,7 @@
                 }
             ],
             "description": "The API client for openl10n",
-            "time": "2015-11-03 12:43:59"
+            "time": "2015-11-03 12:39:10"
         },
         {
             "name": "psr/http-message",
@@ -1816,9 +1816,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "openl10n/sdk": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

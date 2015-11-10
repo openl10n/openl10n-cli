@@ -5,7 +5,7 @@
     "type": "project",
     "require": {
         "php": "^5.4",
-        "openl10n/sdk": "dev-master@dev",
+        "openl10n/sdk": "^0.2",
         "symfony/config": "^2.7",
         "symfony/console": "^2.7",
         "symfony/dependency-injection": "^2.7",
@@ -25,7 +25,7 @@
     "scripts": {
         "test": [
             "phpunit --colors=always",
-            "behat --format=progress"
+            "behat --format=progress --colors"
         ]
     },
     "bin": [
