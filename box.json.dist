@@ -4,8 +4,7 @@
         "src"
     ],
     "files": [
-        "LICENSE",
-        "./vendor/guzzlehttp/guzzle/src/cacert.pem"
+        "LICENSE"
     ],
     "finder": [
         {
