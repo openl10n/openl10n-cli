@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.2.1 - 2016-03-02
 
 - Allow `init` command to be used in non-interactive mode
 - Add possibility to pull specific files
