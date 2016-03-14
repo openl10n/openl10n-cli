@@ -46,6 +46,7 @@ class ApplicationFactory
             new Command\InitCommand(),
             new Command\PullCommand(),
             new Command\PushCommand(),
+            new Command\RemoveTranslationCommand()
         ];
     }
 
