@@ -105,7 +105,13 @@ class PushCommand extends AbstractCommand
                 }
 
                 // Skip unwanted files
-                if (!empty($fileFilter) && !in_array($file->getRelativePathname(), $fileFilter)) {
+                if (
+                    !empty($fileFilter) 
+                    && !(
+                        in_array($file->getAbsolutePathname(), $fileFilter) 
+                        || in_array($file->getRelativePathname(), $fileFilter)
+                    )
+                ) {
                     continue;
                 }
 
